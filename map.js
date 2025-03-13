@@ -21,7 +21,7 @@ fetch('schools.json')
                 iconSize: [20, 20]
             });
 
-            var marker = L.marker([school.lat, school.lng], { icon: schoolIcon })
+            var marker = L.marker([school.geometry.coordinates[1], school.geometry.coordinates[0]], { icon: schoolIcon })
                 .bindPopup(`<b>${school.name}</b><br>Год постройки: ${school.year}`);
 
             markers.addLayer(marker);
