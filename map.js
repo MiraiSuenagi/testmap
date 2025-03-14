@@ -22,6 +22,8 @@ function loadSchools(year, month) {
                Math.floor(school.properties.completed) <= year && 
                schoolDate.getMonth() + 1 <= month; // Учитываем месяц
     });
+console.log("Фильтруем данные за:", year, month);
+console.log(filteredData);
 
     filteredData.forEach(school => {
         var schoolIcon = L.icon({
