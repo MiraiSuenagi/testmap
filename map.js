@@ -45,7 +45,7 @@ function loadSchools(year, month) {
         if (!isCompleted) return false;
 
         // Фильтр по региону
-        if (selectedRegion !== "all" && !school.properties.region.includes(selectedRegion)) {
+        if (selectedRegion !== "all" && school.properties.region !== selectedRegion) {
             return false;
         }
 
@@ -126,38 +126,6 @@ document.getElementById('month-slider').addEventListener('input', function () {
     let selectedMonth = parseInt(this.value);
     loadSchools(selectedYear, selectedMonth);
 });
-
-// Автоматическое движение ползунков
-let yearSlider = document.getElementById('timeline-slider');
-let monthSlider = document.getElementById('month-slider');
-let currentYear = parseInt(yearSlider.min);
-let maxYear = parseInt(yearSlider.max);
-let currentMonth = 1;
-let playing = true;
-
-function autoPlaySlider() {
-    let interval = setInterval(() => {
-        if (!playing) return;
-        
-        if (currentMonth > 12) {
-            currentMonth = 1;
-            currentYear++;
-        }
-        if (currentYear > maxYear) {
-            currentYear = parseInt(yearSlider.min);
-        }
-        monthSlider.value = currentMonth;
-        yearSlider.value = currentYear;
-        monthSlider.dispatchEvent(new Event('input'));
-        yearSlider.dispatchEvent(new Event('input'));
-        currentMonth++;
-    }, 1000);
-
-    document.getElementById("toggleAnimation").addEventListener("click", function () {
-        playing = !playing;
-        this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
-    });
-}
 
 autoPlaySlider();
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
