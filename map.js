@@ -109,6 +109,7 @@ fetch('schools.json')
         console.log("Данные школ загружены:", schoolData);
         document.getElementById("total-schools").textContent = schoolData.length;
         loadSchools();
+        autoPlaySlider(); // Запускаем анимацию после загрузки данных
     })
     .catch(error => console.error('Ошибка загрузки данных:', error));
 
@@ -149,5 +150,9 @@ function autoPlaySlider() {
     });
 }
 
-autoPlaySlider();
+// Добавляем обработчик для кнопки паузы/старта
+document.getElementById("toggleAnimation").addEventListener("click", function () {
+    playing = !playing;
+    this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
+});
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
