@@ -12,17 +12,16 @@ var markers = L.markerClusterGroup({
 });
 
 var schoolData = []; // Хранение всех данных
+var displayedSchools = new Set(); // Хранение уже добавленных школ
 
 // Функция для загрузки и отображения школ
 function loadSchools(year, month) {
-    markers.clearLayers(); // Очистка карты
-    
     let filteredData = schoolData.filter(school => {
         if (!school.properties.completed) return false;
 
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
         
-        // Теперь школы остаются, если сданы до выбранного месяца
+        // Оставляем все школы, завершенные до выбранного месяца
         return (
             completedDate.getFullYear() < year || 
             (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month)
@@ -32,6 +31,11 @@ function loadSchools(year, month) {
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
 
     filteredData.forEach(school => {
+        let schoolId = school.properties.name; // Уникальный ID для отслеживания
+        if (displayedSchools.has(schoolId)) return; // Если уже добавлена, пропускаем
+        
+        displayedSchools.add(schoolId); // Добавляем в список отображаемых
+
         var schoolIcon = L.icon({
             iconUrl: 'https://cdn-icons-png.flaticon.com/512/1048/1048953.png',
             iconSize: [20, 20]
