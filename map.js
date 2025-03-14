@@ -6,12 +6,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-var markers = L.markerClusterGroup({
-    maxClusterRadius: 30,
-    disableClusteringAtZoom: 10
-});
-
-var schoolData = []; // Хранение всех данных
+var markers = L.layerGroup(); // Группа для маркеров
+var schoolData = []; // Данные о школах
 
 // Функция для загрузки и отображения школ
 function loadSchools(year, month) {
@@ -31,16 +27,31 @@ function loadSchools(year, month) {
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
 
+    // Группируем школы по координатам
+    let schoolCounts = {};
     filteredData.forEach(school => {
-        var schoolIcon = L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/1048/1048953.png',
-            iconSize: [20, 20]
-        });
+        let coords = school.geometry.coordinates.join(',');
+        if (!schoolCounts[coords]) {
+            schoolCounts[coords] = 0;
+        }
+        schoolCounts[coords]++;
+    });
 
-        var marker = L.marker([school.geometry.coordinates[1], school.geometry.coordinates[0]], { icon: schoolIcon })
-            .bindPopup(`<b>${school.properties.name}</b><br>Год постройки: ${school.properties.completed}`);
+    // Добавляем круги с числами
+    Object.keys(schoolCounts).forEach(coords => {
+        let [lng, lat] = coords.split(',').map(Number);
+        let count = schoolCounts[coords];
 
-        markers.addLayer(marker);
+        var circle = L.circleMarker([lat, lng], {
+            radius: 8 + count * 2, // Размер зависит от количества школ
+            fillColor: "#007bff",
+            color: "#fff",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).bindTooltip(`<b>${count} школ</b>`, { permanent: true, direction: "center", className: "circle-label" });
+
+        markers.addLayer(circle);
     });
 
     map.addLayer(markers);
