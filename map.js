@@ -22,10 +22,10 @@ function loadSchools(year, month) {
 
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
         
-        // Фильтрация: показывать только школы, завершенные в выбранный месяц
+        // Теперь школы остаются, если сданы до выбранного месяца
         return (
             completedDate.getFullYear() < year || 
-            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 === month)
+            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month)
         );
     });
     
