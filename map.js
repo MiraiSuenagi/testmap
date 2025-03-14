@@ -84,6 +84,7 @@ function loadSchools() {
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
 
+
     updateSchoolInfo(filteredData); // Обновляем карточку
 
     // Группируем школы по координатам
