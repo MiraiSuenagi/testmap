@@ -6,7 +6,6 @@
     <title>Национальный проект «Комфортная школа»</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script> <!-- Библиотека Excel -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -61,24 +60,6 @@
             background: #b71c1c;
         }
 
-        /* Карточка информации */
-        #school-info {
-            margin-top: 20px;
-            padding: 10px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-            text-align: left;
-        }
-
-        #school-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 5px;
-            font-size: 14px;
-        }
-
         /* Контейнер для карты */
         #main-container {
             flex-grow: 1;
@@ -87,7 +68,6 @@
             padding: 20px;
             align-items: center;
             justify-content: center;
-            position: relative;
         }
 
         #map {
@@ -97,31 +77,10 @@
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Кнопка "Скачать Excel" */
-        #downloadExcel {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 15px;
-            background: #28a745;
-            color: white;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-            transition: 0.3s;
-        }
-
-        #downloadExcel:hover {
-            background: #218838;
-        }
-
         /* Ползунки */
         #controls {
             width: 95%;
             margin-top: 10px;
-            text-align: center;
         }
 
         .slider-container {
@@ -168,25 +127,7 @@
             <option value="Астана">Астана</option>
             <option value="Алматы">Алматы</option>
             <option value="Шымкент">Шымкент</option>
-            <option value="Акмолинская область">Акмолинская область</option>
-            <option value="Актюбинская область">Актюбинская область</option>
-            <option value="Алматинская область">Алматинская область</option>
-            <option value="Атырауская область">Атырауская область</option>
-            <option value="Восточно-Казахстанская область">Восточно-Казахстанская область</option>
-            <option value="Жамбылская область">Жамбылская область</option>
-            <option value="Западно-Казахстанская область">Западно-Казахстанская область</option>
-            <option value="Карагандинская область">Карагандинская область</option>
-            <option value="Костанайская область">Костанайская область</option>
-            <option value="Кызылординская область">Кызылординская область</option>
-            <option value="Мангистауская область">Мангистауская область</option>
-            <option value="Павлодарская область">Павлодарская область</option>
-            <option value="Северо-Казахстанская область">Северо-Казахстанская область</option>
-            <option value="Туркестанская область">Туркестанская область</option>
-            <option value="Улытауская область">Улытауская область</option>
-            <option value="Жетысуская область">Жетысуская область</option>
-            <option value="Абайская область">Абайская область</option>
         </select>
-
         <button class="filter-btn" onclick="applyRegionFilter()">Применить</button>
         <button class="filter-btn reset" onclick="resetFilters()">Сбросить</button>
     </div>
@@ -194,14 +135,15 @@
     <!-- Основной контейнер -->
     <div id="main-container">
         <h2>Национальный проект «Комфортная школа»</h2>
-        <button id="downloadExcel">📥 Скачать Excel</button>
         <div id="map"></div>
+
         <div id="controls">
             <div class="slider-container">
                 <label for="timeline-slider">Выберите год:</label>
                 <input type="range" id="timeline-slider" min="2024" max="2025" step="1" value="2024">
                 <div class="labels"><span>2024</span><span>2025</span></div>
             </div>
+
             <div class="slider-container">
                 <label for="month-slider">Выберите месяц:</label>
                 <input type="range" id="month-slider" min="1" max="12" step="1" value="1">
@@ -210,8 +152,6 @@
         </div>
     </div>
 
-    <!-- Теперь `map.js` загружается ПОСЛЕ всех элементов -->
     <script src="map.js"></script>
-
 </body>
 </html>
