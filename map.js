@@ -11,31 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let yearSlider = document.getElementById('timeline-slider');
     let monthSlider = document.getElementById('month-slider');
-    let totalSchoolsEl = document.getElementById("total-schools");
-    let filteredSchoolsEl = document.getElementById("filtered-schools");
-    let schoolListEl = document.getElementById("school-list");
-    let playing = true;
-
-    // Проверяем существование элементов
-    if (!yearSlider || !monthSlider || !totalSchoolsEl || !filteredSchoolsEl || !schoolListEl) {
-        console.error("Один или несколько элементов UI не найдены в HTML!");
-        return;
-    }
 
     function updateSchoolInfo(filteredData) {
-        totalSchoolsEl.textContent = schoolData.length;
-        filteredSchoolsEl.textContent = filteredData.length;
-        schoolListEl.innerHTML = "";
-
-        if (filteredData.length === 0) {
-            schoolListEl.innerHTML = "<p>Нет школ в этом регионе.</p>";
-        } else {
-            filteredData.forEach(school => {
-                let schoolItem = document.createElement("div");
-                schoolItem.textContent = school.properties.name;
-                schoolListEl.appendChild(schoolItem);
-            });
-        }
+        document.getElementById("total-schools").textContent = schoolData.length;
+        document.getElementById("filtered-schools").textContent = filteredData.length;
     }
 
     function loadSchools() {
@@ -52,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
 
             if (!isCompleted) return false;
-
             if (selectedRegion !== "all" && school.properties.region !== selectedRegion) {
                 return false;
             }
@@ -74,7 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
         Object.keys(schoolCounts).forEach(coords => {
             let [lng, lat] = coords.split(',').map(Number);
             let count = schoolCounts[coords].length;
-            let schoolNames = schoolCounts[coords].join("<br>");
 
             var circle = L.circleMarker([lat, lng], {
                 radius: 8 + count * 2,
@@ -84,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 opacity: 1,
                 fillOpacity: 0.8,
                 interactive: true
-            }).bindPopup(`<b>Школы:</b><br>${schoolNames}`);
+            });
 
             markers.addLayer(circle);
         });
@@ -97,22 +74,10 @@ document.addEventListener("DOMContentLoaded", function () {
         loadSchools();
     }
 
-    function resetFilters() {
-        selectedRegion = "all";
-        loadSchools();
-    }
-
     fetch('schools.json')
         .then(response => response.json())
         .then(data => {
             schoolData = data;
-            console.log("Данные школ загружены:", schoolData);
-
-            // Проверяем перед установкой значений
-            if (totalSchoolsEl) {
-                totalSchoolsEl.textContent = schoolData.length;
-            }
-
             loadSchools();
         })
         .catch(error => console.error('Ошибка загрузки данных:', error));
