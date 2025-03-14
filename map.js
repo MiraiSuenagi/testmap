@@ -21,9 +21,12 @@ function loadSchools(year, month) {
         if (!school.properties.completed) return false;
 
         let completedDate = new Date(String(school.properties.completed));
-        let schoolDate = new Date(school.properties.date + "-01");
-
-        return completedDate.getFullYear() <= year && schoolDate.getMonth() + 1 <= month;
+        
+        // Учитываем год и месяц
+        return (
+            completedDate.getFullYear() < year || 
+            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month)
+        );
     });
     
     console.log("Фильтруем данные за:", year, month);
