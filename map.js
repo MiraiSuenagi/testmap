@@ -61,7 +61,7 @@ document.getElementById('month-slider').addEventListener('input', function () {
     loadSchools(selectedYear, selectedMonth);
 });
 
-// Автоматическое движение ползунков (анимация)
+// Автоматическое движение ползунков (сначала месяцы, потом год)
 let yearSlider = document.getElementById('timeline-slider');
 let monthSlider = document.getElementById('month-slider');
 let currentYear = parseInt(yearSlider.min);
@@ -77,10 +77,10 @@ function autoPlaySlider() {
         if (currentYear > maxYear) {
             currentYear = parseInt(yearSlider.min);
         }
-        yearSlider.value = currentYear;
         monthSlider.value = currentMonth;
-        yearSlider.dispatchEvent(new Event('input'));
+        yearSlider.value = currentYear;
         monthSlider.dispatchEvent(new Event('input'));
+        yearSlider.dispatchEvent(new Event('input'));
         currentMonth++;
     }, 1000); // Меняем месяц каждую секунду
 }
