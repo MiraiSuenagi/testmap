@@ -82,7 +82,7 @@ function loadSchools() {
         return true;
     });
 
-    console.log(Школ отфильтровано: ${filteredData.length} за ${year}-${month});
+    console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
 
     updateSchoolInfo(filteredData); // Обновляем карточку
 
