@@ -118,6 +118,48 @@ function loadSchools() {
     map.addLayer(markers);
 }
 
+// Функция для скачивания перечня школ в Excel
+function downloadExcel() {
+    let year = parseInt(yearSlider.value);
+    let month = parseInt(monthSlider.value);
+
+    let filteredData = schoolData.filter(school => {
+        if (!school.properties.completed) return false;
+
+        let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
+        let isCompleted = completedDate.getFullYear() < year || 
+            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
+
+        if (!isCompleted) return false;
+        if (selectedRegion !== "all" && school.properties.region !== selectedRegion) {
+            return false;
+        }
+
+        return true;
+    });
+
+    if (filteredData.length === 0) {
+        alert("Нет данных для скачивания!");
+        return;
+    }
+
+    // Преобразуем данные в массив объектов для Excel
+    let excelData = filteredData.map(school => ({
+        "Название школы": school.properties.name,
+        "Регион": school.properties.region,
+        "Год завершения": school.properties.completed,
+        "Координаты": `${school.geometry.coordinates[1]}, ${school.geometry.coordinates[0]}`
+    }));
+
+    // Создаем лист Excel
+    let worksheet = XLSX.utils.json_to_sheet(excelData);
+    let workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Школы");
+
+    // Скачиваем файл
+    XLSX.writeFile(workbook, "Список_школ.xlsx");
+}
+
 // Фильтр по регионам
 function applyRegionFilter() {
     selectedRegion = document.getElementById("region-select").value;
@@ -157,4 +199,8 @@ document.getElementById("toggleAnimation").addEventListener("click", function ()
     playing = !playing;
     this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
 });
+
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
+
+// Добавляем обработчик на кнопку "Скачать Excel"
+document.getElementById("downloadExcel").addEventListener("click", downloadExcel);
