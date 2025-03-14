@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Карта строительства школ</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,7 +17,7 @@
 
         /* Левая панель */
         #sidebar {
-            width: 250px;
+            width: 300px;
             background: #f8f9fa;
             padding: 20px;
             display: flex;
@@ -31,16 +28,17 @@
 
         #sidebar h3 {
             margin: 0;
-            font-size: 18px;
+            font-size: 20px;
         }
 
         #region-select {
-            padding: 8px;
+            padding: 10px;
             font-size: 16px;
+            width: 100%;
         }
 
         .filter-btn {
-            padding: 10px;
+            padding: 12px;
             font-size: 16px;
             border: none;
             background: #007bff;
@@ -73,13 +71,18 @@
         }
 
         #map {
-            height: 500px;
-            width: 90%;
+            height: 700px; /* Увеличили высоту карты */
+            width: 95%;
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         /* Ползунки */
+        #controls {
+            width: 95%; /* Растянули ползунки */
+            margin-top: 10px;
+        }
+
         .slider-container {
             width: 100%;
             margin-top: 10px;
@@ -88,7 +91,7 @@
         input[type="range"] {
             width: 100%;
             appearance: none;
-            height: 8px;
+            height: 10px;
             border-radius: 5px;
             background: linear-gradient(to right, #007bff, #00bfff);
             outline: none;
@@ -97,8 +100,8 @@
 
         input[type="range"]::-webkit-slider-thumb {
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             background: #007bff;
             cursor: pointer;
@@ -124,8 +127,23 @@
             <option value="Астана">Астана</option>
             <option value="Алматы">Алматы</option>
             <option value="Шымкент">Шымкент</option>
-            <option value="Караганда">Караганда</option>
-            <!-- Добавь другие регионы -->
+            <option value="Акмолинская область">Акмолинская область</option>
+            <option value="Актюбинская область">Актюбинская область</option>
+            <option value="Алматинская область">Алматинская область</option>
+            <option value="Атырауская область">Атырауская область</option>
+            <option value="Восточно-Казахстанская область">Восточно-Казахстанская область</option>
+            <option value="Жамбылская область">Жамбылская область</option>
+            <option value="Западно-Казахстанская область">Западно-Казахстанская область</option>
+            <option value="Карагандинская область">Карагандинская область</option>
+            <option value="Костанайская область">Костанайская область</option>
+            <option value="Кызылординская область">Кызылординская область</option>
+            <option value="Мангистауская область">Мангистауская область</option>
+            <option value="Павлодарская область">Павлодарская область</option>
+            <option value="Северо-Казахстанская область">Северо-Казахстанская область</option>
+            <option value="Туркестанская область">Туркестанская область</option>
+            <option value="Улытауская область">Улытауская область</option>
+            <option value="Жетысуская область">Жетысуская область</option>
+            <option value="Абайская область">Абайская область</option>
         </select>
         <button class="filter-btn" onclick="applyRegionFilter()">Применить</button>
         <button class="filter-btn reset" onclick="resetFilters()">Сбросить</button>
