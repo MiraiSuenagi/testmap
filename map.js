@@ -14,13 +14,16 @@ var markers = L.markerClusterGroup({
 var schoolData = []; // Хранение всех данных
 
 // Функция для загрузки и отображения школ
-function loadSchools(year) {
+function loadSchools(year, month) {
     markers.clearLayers(); // Очистка карты
-    let filteredData = schoolData.filter(school => school.properties.completed && Math.floor(school.properties.completed) <= year);
+    let filteredData = schoolData.filter(school => {
+        let schoolDate = new Date(school.properties.date + "-01"); // Преобразуем в дату
+        return school.properties.completed && 
+               Math.floor(school.properties.completed) <= year && 
+               schoolDate.getMonth() + 1 <= month; // Учитываем месяц
+    });
 
     filteredData.forEach(school => {
-        console.log(school.properties); // Проверяем структуру данных
-
         var schoolIcon = L.icon({
             iconUrl: 'https://cdn-icons-png.flaticon.com/512/1048/1048953.png',
             iconSize: [20, 20]
@@ -41,30 +44,45 @@ fetch('schools.json')
     .then(data => {
         schoolData = data;
         console.log(schoolData); // Проверяем структуру данных
-        loadSchools(2024); // Начальный год
+        loadSchools(2024, 1); // Начальный год и месяц
     })
     .catch(error => console.error('Ошибка загрузки данных:', error));
 
-// Обработка изменения ползунка
+// Обработка изменения ползунков
 document.getElementById('timeline-slider').addEventListener('input', function () {
     let selectedYear = parseInt(this.value);
-    loadSchools(selectedYear);
+    let selectedMonth = parseInt(document.getElementById('month-slider').value);
+    loadSchools(selectedYear, selectedMonth);
 });
 
-// Автоматическое движение ползунка (анимация)
+document.getElementById('month-slider').addEventListener('input', function () {
+    let selectedYear = parseInt(document.getElementById('timeline-slider').value);
+    let selectedMonth = parseInt(this.value);
+    loadSchools(selectedYear, selectedMonth);
+});
+
+// Автоматическое движение ползунков (анимация)
 let yearSlider = document.getElementById('timeline-slider');
+let monthSlider = document.getElementById('month-slider');
 let currentYear = parseInt(yearSlider.min);
 let maxYear = parseInt(yearSlider.max);
+let currentMonth = 1;
 
 function autoPlaySlider() {
-    let interval = setInterval(() => {
+    setInterval(() => {
+        if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+        }
         if (currentYear > maxYear) {
-            currentYear = parseInt(yearSlider.min); // Вернуться к началу
+            currentYear = parseInt(yearSlider.min);
         }
         yearSlider.value = currentYear;
-        yearSlider.dispatchEvent(new Event('input')); // Симулируем ручное нажатие
-        currentYear++;
-    }, 2000); // Меняем год каждые 2 секунды (можно настроить)
+        monthSlider.value = currentMonth;
+        yearSlider.dispatchEvent(new Event('input'));
+        monthSlider.dispatchEvent(new Event('input'));
+        currentMonth++;
+    }, 1000); // Меняем месяц каждую секунду
 }
 
 autoPlaySlider(); // Запускаем анимацию
