@@ -16,7 +16,8 @@ var schoolData = []; // Хранение всех данных
 // Функция для загрузки и отображения школ
 function loadSchools(year, month) {
     markers.clearLayers(); // Очистка карты
-    let filteredData = schoolData.filter(school => {
+    let filteredData = schoolData.filter(school => school.properties.completed && new Date(school.properties.completed).getFullYear() <= year);
+
         let schoolDate = new Date(school.properties.date + "-01"); // Преобразуем в дату
         return school.properties.completed && 
                Math.floor(school.properties.completed) <= year && 
