@@ -16,10 +16,10 @@ var schoolData = []; // Хранение всех данных
 // Функция для загрузки и отображения школ
 function loadSchools(year) {
     markers.clearLayers(); // Очистка карты
-    let filteredData = schoolData.filter(school => school.properties.completed <= year);
+    let filteredData = schoolData.filter(school => school.properties.completed && Math.floor(school.properties.completed) <= year);
 
     filteredData.forEach(school => {
-        console.log(school.properties); // Проверяем, какие данные есть
+        console.log(school.properties); // Проверяем структуру данных
 
         var schoolIcon = L.icon({
             iconUrl: 'https://cdn-icons-png.flaticon.com/512/1048/1048953.png',
@@ -27,7 +27,7 @@ function loadSchools(year) {
         });
 
         var marker = L.marker([school.geometry.coordinates[1], school.geometry.coordinates[0]], { icon: schoolIcon })
-            .bindPopup(`<b>${school.properties.name}</b><br>Год постройки: ${school.properties.completed}`);
+            .bindPopup(`<b>${school.properties.name}</b><br>Год постройки: ${school.properties.completed ? Math.floor(school.properties.completed) : "Неизвестно"}`);
 
         markers.addLayer(marker);
     });
@@ -50,3 +50,21 @@ document.getElementById('timeline-slider').addEventListener('input', function ()
     let selectedYear = parseInt(this.value);
     loadSchools(selectedYear);
 });
+
+// Автоматическое движение ползунка (анимация)
+let yearSlider = document.getElementById('timeline-slider');
+let currentYear = parseInt(yearSlider.min);
+let maxYear = parseInt(yearSlider.max);
+
+function autoPlaySlider() {
+    let interval = setInterval(() => {
+        if (currentYear > maxYear) {
+            currentYear = parseInt(yearSlider.min); // Вернуться к началу
+        }
+        yearSlider.value = currentYear;
+        yearSlider.dispatchEvent(new Event('input')); // Симулируем ручное нажатие
+        currentYear++;
+    }, 2000); // Меняем год каждые 2 секунды (можно настроить)
+}
+
+autoPlaySlider(); // Запускаем анимацию
