@@ -6,12 +6,13 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-var markers = L.layerGroup(); // Группа для маркеров
-var schoolData = []; // Данные о школах
+var markers = L.layerGroup();
+var schoolData = [];
+var selectedRegion = "all"; // Выбранный регион
 
 // Функция для загрузки и отображения школ
 function loadSchools(year, month) {
-    markers.clearLayers(); // Очищаем карту перед добавлением новых точек
+    markers.clearLayers();
 
     let filteredData = schoolData.filter(school => {
         if (!school.properties.completed) return false;
@@ -19,10 +20,17 @@ function loadSchools(year, month) {
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
         
         // Фильтруем школы, завершенные до текущего месяца
-        return (
-            completedDate.getFullYear() < year || 
-            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month)
-        );
+        let isCompleted = completedDate.getFullYear() < year || 
+            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
+        
+        if (!isCompleted) return false;
+
+        // Фильтр по региону
+        if (selectedRegion !== "all" && !school.properties.name.includes(selectedRegion)) {
+            return false;
+        }
+
+        return true;
     });
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
@@ -37,28 +45,40 @@ function loadSchools(year, month) {
         schoolCounts[coords]++;
     });
 
-   
     // Добавляем круги без текста
-Object.keys(schoolCounts).forEach(coords => {
-    let [lng, lat] = coords.split(',').map(Number);
-    let count = schoolCounts[coords];
+    Object.keys(schoolCounts).forEach(coords => {
+        let [lng, lat] = coords.split(',').map(Number);
+        let count = schoolCounts[coords];
 
-    var circle = L.circleMarker([lat, lng], {
-    radius: 8 + count * 2, // Размер зависит от количества школ
-    fillColor: "#007bff",
-    color: "#fff",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8,
-    interactive: false // Отключаем всплывающие подсказки
-});
+        var circle = L.circleMarker([lat, lng], {
+            radius: 8 + count * 2, // Размер зависит от количества школ
+            fillColor: "#007bff",
+            color: "#fff",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8,
+            interactive: false
+        });
 
+        markers.addLayer(circle);
+    });
 
-    markers.addLayer(circle);
-});
+    map.addLayer(markers);
+}
 
-map.addLayer(markers);
+// Фильтр по регионам
+function applyRegionFilter() {
+    selectedRegion = document.getElementById("region-select").value;
+    let selectedYear = parseInt(document.getElementById('timeline-slider').value);
+    let selectedMonth = parseInt(document.getElementById('month-slider').value);
+    loadSchools(selectedYear, selectedMonth);
+}
 
+function resetFilters() {
+    selectedRegion = "all";
+    let selectedYear = parseInt(document.getElementById('timeline-slider').value);
+    let selectedMonth = parseInt(document.getElementById('month-slider').value);
+    loadSchools(selectedYear, selectedMonth);
 }
 
 // Загрузка данных
@@ -67,7 +87,7 @@ fetch('schools.json')
     .then(data => {
         schoolData = data;
         console.log("Данные школ загружены:", schoolData);
-        loadSchools(2024, 1); // Начальный год и месяц
+        loadSchools(2024, 1);
     })
     .catch(error => console.error('Ошибка загрузки данных:', error));
 
@@ -117,3 +137,4 @@ function autoPlaySlider() {
 }
 
 autoPlaySlider();
+document.getElementById("region-select").addEventListener("change", applyRegionFilter);
