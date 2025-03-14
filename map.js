@@ -75,9 +75,12 @@ let monthSlider = document.getElementById('month-slider');
 let currentYear = parseInt(yearSlider.min);
 let maxYear = parseInt(yearSlider.max);
 let currentMonth = 1;
+let playing = true;
 
 function autoPlaySlider() {
-    setInterval(() => {
+    let interval = setInterval(() => {
+        if (!playing) return;
+        
         if (currentMonth > 12) {
             currentMonth = 1;
             currentYear++;
@@ -90,7 +93,13 @@ function autoPlaySlider() {
         monthSlider.dispatchEvent(new Event('input'));
         yearSlider.dispatchEvent(new Event('input'));
         currentMonth++;
-    }, 1000); // Меняем месяц каждую секунду
+    }, 1000);
+
+    // Кнопка старт/стоп
+    document.getElementById("toggleAnimation").addEventListener("click", function () {
+        playing = !playing;
+        this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
+    });
 }
 
 autoPlaySlider(); // Запускаем анимацию
