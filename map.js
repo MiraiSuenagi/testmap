@@ -10,6 +10,34 @@ var markers = L.layerGroup();
 var schoolData = [];
 var selectedRegion = "all"; // Выбранный регион
 
+// Автоматическое движение ползунков
+let playing = true;
+let yearSlider = document.getElementById('timeline-slider');
+let monthSlider = document.getElementById('month-slider');
+let currentYear = parseInt(yearSlider.min);
+let maxYear = parseInt(yearSlider.max);
+let currentMonth = 1;
+
+function autoPlaySlider() {
+    let interval = setInterval(() => {
+        if (!playing) return;
+
+        if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+        }
+        if (currentYear > maxYear) {
+            currentYear = parseInt(yearSlider.min);
+        }
+
+        monthSlider.value = currentMonth;
+        yearSlider.value = currentYear;
+        loadSchools(); // Перерисовываем карту при изменении
+
+        currentMonth++;
+    }, 1000);
+}
+
 // Функция обновления информации в карточке
 function updateSchoolInfo(filteredData) {
     document.getElementById("total-schools").textContent = schoolData.length;
@@ -116,39 +144,6 @@ fetch('schools.json')
 // Обработка изменения ползунков
 document.getElementById('timeline-slider').addEventListener('input', loadSchools);
 document.getElementById('month-slider').addEventListener('input', loadSchools);
-
-// Автоматическое движение ползунков
-let playing = true;
-let yearSlider = document.getElementById('timeline-slider');
-let monthSlider = document.getElementById('month-slider');
-let currentYear = parseInt(yearSlider.min);
-let maxYear = parseInt(yearSlider.max);
-let currentMonth = 1;
-
-function autoPlaySlider() {
-    let interval = setInterval(() => {
-        if (!playing) return;
-
-        if (currentMonth > 12) {
-            currentMonth = 1;
-            currentYear++;
-        }
-        if (currentYear > maxYear) {
-            currentYear = parseInt(yearSlider.min);
-        }
-
-        monthSlider.value = currentMonth;
-        yearSlider.value = currentYear;
-        loadSchools(); // Перерисовываем карту при изменении
-
-        currentMonth++;
-    }, 1000);
-
-    document.getElementById("toggleAnimation").addEventListener("click", function () {
-        playing = !playing;
-        this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
-    });
-}
 
 // Добавляем обработчик для кнопки паузы/старта
 document.getElementById("toggleAnimation").addEventListener("click", function () {
