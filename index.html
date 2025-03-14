@@ -16,6 +16,20 @@
             margin: 0;
             padding: 0;
         }
+<div id="sidebar">
+    <h3>Фильтры</h3>
+    <label for="region-select">Выберите регион:</label>
+    <select id="region-select">
+        <option value="all">Все регионы</option>
+        <option value="Астана">Астана</option>
+        <option value="Алматы">Алматы</option>
+        <option value="Шымкент">Шымкент</option>
+        <option value="Караганда">Караганда</option>
+        <!-- Добавь другие регионы -->
+    </select>
+    <button class="filter-btn" onclick="applyRegionFilter()">Применить</button>
+    <button class="filter-btn reset" onclick="resetFilters()">Сбросить</button>
+</div>
 
         #map-container {
             position: relative;
