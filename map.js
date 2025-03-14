@@ -16,15 +16,18 @@ var schoolData = []; // Хранение всех данных
 // Функция для загрузки и отображения школ
 function loadSchools(year, month) {
     markers.clearLayers(); // Очистка карты
-    let filteredData = schoolData.filter(school => school.properties.completed && new Date(school.properties.completed).getFullYear() <= year);
+    
+    let filteredData = schoolData.filter(school => {
+        if (!school.properties.completed) return false;
 
-        let schoolDate = new Date(school.properties.date + "-01"); // Преобразуем в дату
-        return school.properties.completed && 
-               Math.floor(school.properties.completed) <= year && 
-               schoolDate.getMonth() + 1 <= month; // Учитываем месяц
+        let completedDate = new Date(String(school.properties.completed));
+        let schoolDate = new Date(school.properties.date + "-01");
+
+        return completedDate.getFullYear() <= year && schoolDate.getMonth() + 1 <= month;
     });
-console.log("Фильтруем данные за:", year, month);
-console.log(filteredData);
+    
+    console.log("Фильтруем данные за:", year, month);
+    console.log(filteredData);
 
     filteredData.forEach(school => {
         var schoolIcon = L.icon({
@@ -33,7 +36,7 @@ console.log(filteredData);
         });
 
         var marker = L.marker([school.geometry.coordinates[1], school.geometry.coordinates[0]], { icon: schoolIcon })
-            .bindPopup(`<b>${school.properties.name}</b><br>Год постройки: ${school.properties.completed ? Math.floor(school.properties.completed) : "Неизвестно"}`);
+            .bindPopup(`<b>${school.properties.name}</b><br>Год постройки: ${school.properties.completed ? school.properties.completed : "Неизвестно"}`);
 
         markers.addLayer(marker);
     });
