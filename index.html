@@ -60,6 +60,24 @@
             background: #b71c1c;
         }
 
+        /* Карточка информации */
+        #school-info {
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+
+        #school-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 5px;
+            font-size: 14px;
+        }
+
         /* Контейнер для карты */
         #main-container {
             flex-grow: 1;
@@ -122,14 +140,39 @@
     <div id="sidebar">
         <h3>Фильтры</h3>
         <label for="region-select">Выберите регион:</label>
-        <select id="region-select">
-            <option value="all">Все регионы</option>
-            <option value="Астана">Астана</option>
-            <option value="Алматы">Алматы</option>
-            <option value="Шымкент">Шымкент</option>
-        </select>
+       <select id="region-select">
+    <option value="all">Все регионы</option>
+    <option value="Астана">Астана</option>
+    <option value="Алматы">Алматы</option>
+    <option value="Шымкент">Шымкент</option>
+    <option value="Акмолинская область">Акмолинская область</option>
+    <option value="Актюбинская область">Актюбинская область</option>
+    <option value="Алматинская область">Алматинская область</option>
+    <option value="Атырауская область">Атырауская область</option>
+    <option value="Восточно-Казахстанская область">Восточно-Казахстанская область</option>
+    <option value="Жамбылская область">Жамбылская область</option>
+    <option value="Западно-Казахстанская область">Западно-Казахстанская область</option>
+    <option value="Карагандинская область">Карагандинская область</option>
+    <option value="Костанайская область">Костанайская область</option>
+    <option value="Кызылординская область">Кызылординская область</option>
+    <option value="Мангистауская область">Мангистауская область</option>
+    <option value="Павлодарская область">Павлодарская область</option>
+    <option value="Северо-Казахстанская область">Северо-Казахстанская область</option>
+    <option value="Туркестанская область">Туркестанская область</option>
+    <option value="Улытауская область">Улытауская область</option>
+    <option value="Жетысуская область">Жетысуская область</option>
+    <option value="Абайская область">Абайская область</option>
+</select>
+
         <button class="filter-btn" onclick="applyRegionFilter()">Применить</button>
         <button class="filter-btn reset" onclick="resetFilters()">Сбросить</button>
+
+        <!-- Карточка с информацией о школах -->
+        <div id="school-info">
+            <h4>Общее количество школ: <span id="total-schools">0</span></h4>
+            <h4>Школ в регионе: <span id="filtered-schools">0</span></h4>
+            <div id="school-list"></div>
+        </div>
     </div>
 
     <!-- Основной контейнер -->
@@ -147,6 +190,11 @@
             <div class="slider-container">
                 <label for="month-slider">Выберите месяц:</label>
                 <input type="range" id="month-slider" min="1" max="12" step="1" value="1">
+                <div class="labels">
+                    <span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span>
+                    <span>Май</span><span>Июн</span><span>Июл</span><span>Авг</span>
+                    <span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
+                </div>
             </div>
             <button id="toggleAnimation">⏸ Пауза</button>
         </div>
