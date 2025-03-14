@@ -20,17 +20,16 @@ function loadSchools(year, month) {
     let filteredData = schoolData.filter(school => {
         if (!school.properties.completed) return false;
 
-        let completedDate = new Date(String(school.properties.completed));
+        let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
         
-        // Учитываем год и месяц
+        // Фильтрация: показывать только школы, завершенные в выбранный месяц
         return (
             completedDate.getFullYear() < year || 
-            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month)
+            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 === month)
         );
     });
     
-    console.log("Фильтруем данные за:", year, month);
-    console.log(filteredData);
+    console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
 
     filteredData.forEach(school => {
         var schoolIcon = L.icon({
