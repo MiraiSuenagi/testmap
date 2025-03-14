@@ -14,14 +14,15 @@ var selectedRegion = "all"; // Выбранный регион
 let playing = true;
 let yearSlider = document.getElementById('timeline-slider');
 let monthSlider = document.getElementById('month-slider');
-let currentYear = parseInt(yearSlider.min);
+let currentYear = parseInt(yearSlider.value);
 let maxYear = parseInt(yearSlider.max);
-let currentMonth = 1;
+let currentMonth = parseInt(monthSlider.value);
 
 function autoPlaySlider() {
     let interval = setInterval(() => {
         if (!playing) return;
 
+        currentMonth++;
         if (currentMonth > 12) {
             currentMonth = 1;
             currentYear++;
@@ -32,9 +33,8 @@ function autoPlaySlider() {
 
         monthSlider.value = currentMonth;
         yearSlider.value = currentYear;
-        loadSchools(); // Перерисовываем карту при изменении
+        loadSchools(); // Обновляем карту
 
-        currentMonth++;
     }, 1000);
 }
 
@@ -59,8 +59,8 @@ function updateSchoolInfo(filteredData) {
 
 // Функция загрузки и отображения школ
 function loadSchools() {
-    let year = parseInt(document.getElementById('timeline-slider').value);
-    let month = parseInt(document.getElementById('month-slider').value);
+    let year = parseInt(yearSlider.value);
+    let month = parseInt(monthSlider.value);
     markers.clearLayers();
 
     let filteredData = schoolData.filter(school => {
@@ -142,8 +142,15 @@ fetch('schools.json')
     .catch(error => console.error('Ошибка загрузки данных:', error));
 
 // Обработка изменения ползунков
-document.getElementById('timeline-slider').addEventListener('input', loadSchools);
-document.getElementById('month-slider').addEventListener('input', loadSchools);
+yearSlider.addEventListener('input', () => {
+    currentYear = parseInt(yearSlider.value);
+    loadSchools();
+});
+
+monthSlider.addEventListener('input', () => {
+    currentMonth = parseInt(monthSlider.value);
+    loadSchools();
+});
 
 // Добавляем обработчик для кнопки паузы/старта
 document.getElementById("toggleAnimation").addEventListener("click", function () {
