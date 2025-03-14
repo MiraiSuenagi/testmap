@@ -44,13 +44,15 @@ Object.keys(schoolCounts).forEach(coords => {
     let count = schoolCounts[coords];
 
     var circle = L.circleMarker([lat, lng], {
-        radius: 8 + count * 2, // Размер зависит от количества школ
-        fillColor: "#007bff",
-        color: "#fff",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8
-    });
+    radius: 8 + count * 2, // Размер зависит от количества школ
+    fillColor: "#007bff",
+    color: "#fff",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8,
+    interactive: false // Отключаем всплывающие подсказки
+});
+
 
     markers.addLayer(circle);
 });
