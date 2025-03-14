@@ -40,25 +40,26 @@ function loadSchools(year, month) {
     filteredData.forEach(school => {
         let coords = school.geometry.coordinates.join(',');
         if (!schoolCounts[coords]) {
-            schoolCounts[coords] = 0;
+            schoolCounts[coords] = [];
         }
-        schoolCounts[coords]++;
+        schoolCounts[coords].push(school.properties.name);
     });
 
-    // Добавляем круги без текста
+    // Добавляем круги с возможностью клика
     Object.keys(schoolCounts).forEach(coords => {
         let [lng, lat] = coords.split(',').map(Number);
-        let count = schoolCounts[coords];
+        let count = schoolCounts[coords].length;
+        let schoolNames = schoolCounts[coords].join("<br>"); // Объединяем все названия школ в одной точке
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2, // Размер зависит от количества школ
-            fillColor: "#28a745",
+            fillColor: "#28a745", // Зеленый цвет
             color: "#fff",
             weight: 1,
             opacity: 1,
             fillOpacity: 0.8,
-            interactive: false
-        });
+            interactive: true
+        }).bindPopup(`<b>Школы:</b><br>${schoolNames}`);
 
         markers.addLayer(circle);
     });
