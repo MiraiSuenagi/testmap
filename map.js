@@ -37,24 +37,26 @@ function loadSchools(year, month) {
         schoolCounts[coords]++;
     });
 
-    // Добавляем круги с числами
-    Object.keys(schoolCounts).forEach(coords => {
-        let [lng, lat] = coords.split(',').map(Number);
-        let count = schoolCounts[coords];
+   
+    // Добавляем круги без текста
+Object.keys(schoolCounts).forEach(coords => {
+    let [lng, lat] = coords.split(',').map(Number);
+    let count = schoolCounts[coords];
 
-        var circle = L.circleMarker([lat, lng], {
-            radius: 8 + count * 2, // Размер зависит от количества школ
-            fillColor: "#007bff",
-            color: "#fff",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8
-        }).bindTooltip(`<b>${count} школ</b>`, { permanent: true, direction: "center", className: "circle-label" });
-
-        markers.addLayer(circle);
+    var circle = L.circleMarker([lat, lng], {
+        radius: 8 + count * 2, // Размер зависит от количества школ
+        fillColor: "#007bff",
+        color: "#fff",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
     });
 
-    map.addLayer(markers);
+    markers.addLayer(circle);
+});
+
+map.addLayer(markers);
+
 }
 
 // Загрузка данных
