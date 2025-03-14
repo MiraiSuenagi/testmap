@@ -10,6 +10,25 @@ var markers = L.layerGroup();
 var schoolData = [];
 var selectedRegion = "all"; // Выбранный регион
 
+// Функция для обновления информации в карточке
+function updateSchoolInfo(filteredData) {
+    document.getElementById("total-schools").textContent = schoolData.length; // Всего школ
+    document.getElementById("filtered-schools").textContent = filteredData.length; // Школ в регионе
+    
+    let schoolList = document.getElementById("school-list");
+    schoolList.innerHTML = ""; // Очищаем список перед обновлением
+
+    if (filteredData.length === 0) {
+        schoolList.innerHTML = "<p>Нет школ в этом регионе.</p>";
+    } else {
+        filteredData.forEach(school => {
+            let schoolItem = document.createElement("div");
+            schoolItem.textContent = school.properties.name;
+            schoolList.appendChild(schoolItem);
+        });
+    }
+}
+
 // Функция для загрузки и отображения школ
 function loadSchools(year, month) {
     markers.clearLayers();
@@ -34,6 +53,8 @@ function loadSchools(year, month) {
     });
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
+
+    updateSchoolInfo(filteredData); // Обновляем карточку
 
     // Группируем школы по координатам
     let schoolCounts = {};
