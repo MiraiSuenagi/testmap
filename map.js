@@ -10,7 +10,7 @@ var markers = L.layerGroup();
 var schoolData = [];
 var selectedRegion = "all"; // Выбранный регион
 
-// Функция для обновления информации в карточке
+// Функция обновления информации в карточке
 function updateSchoolInfo(filteredData) {
     document.getElementById("total-schools").textContent = schoolData.length; // Всего школ
     document.getElementById("filtered-schools").textContent = filteredData.length; // Школ в регионе
@@ -29,7 +29,7 @@ function updateSchoolInfo(filteredData) {
     }
 }
 
-// Функция для загрузки и отображения школ
+// Функция загрузки и отображения школ
 function loadSchools(year, month) {
     markers.clearLayers();
 
@@ -45,7 +45,7 @@ function loadSchools(year, month) {
         if (!isCompleted) return false;
 
         // Фильтр по региону
-        if (selectedRegion !== "all" && !school.properties.name.includes(selectedRegion)) {
+        if (selectedRegion !== "all" && !school.properties.region.includes(selectedRegion)) {
             return false;
         }
 
@@ -109,6 +109,7 @@ fetch('schools.json')
     .then(data => {
         schoolData = data;
         console.log("Данные школ загружены:", schoolData);
+        document.getElementById("total-schools").textContent = schoolData.length; // Устанавливаем общее количество школ
         loadSchools(2024, 1);
     })
     .catch(error => console.error('Ошибка загрузки данных:', error));
