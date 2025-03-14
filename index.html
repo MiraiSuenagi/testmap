@@ -100,7 +100,7 @@
         /* Кнопка "Скачать Excel" */
         #downloadExcel {
             position: absolute;
-            top: 10px;
+            top: 20px;
             right: 20px;
             padding: 10px 15px;
             background: #28a745;
@@ -121,6 +121,7 @@
         #controls {
             width: 95%;
             margin-top: 10px;
+            text-align: center;
         }
 
         .slider-container {
@@ -195,8 +196,22 @@
         <h2>Национальный проект «Комфортная школа»</h2>
         <button id="downloadExcel">📥 Скачать Excel</button>
         <div id="map"></div>
+        <div id="controls">
+            <div class="slider-container">
+                <label for="timeline-slider">Выберите год:</label>
+                <input type="range" id="timeline-slider" min="2024" max="2025" step="1" value="2024">
+                <div class="labels"><span>2024</span><span>2025</span></div>
+            </div>
+            <div class="slider-container">
+                <label for="month-slider">Выберите месяц:</label>
+                <input type="range" id="month-slider" min="1" max="12" step="1" value="1">
+            </div>
+            <button id="toggleAnimation">⏸ Пауза</button>
+        </div>
     </div>
 
+    <!-- Теперь `map.js` загружается ПОСЛЕ всех элементов -->
     <script src="map.js"></script>
+
 </body>
 </html>
