@@ -110,7 +110,7 @@ function loadSchools() {
             opacity: 1,
             fillOpacity: 0.8,
             interactive: true
-        }).bindPopup(<b>Школы:</b><br>${schoolNames});
+        }).bindPopup(`<b>Школы:</b><br>${schoolNames}`);
 
         markers.addLayer(circle);
     });
