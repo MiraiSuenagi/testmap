@@ -16,7 +16,7 @@ var schoolData = []; // Хранение всех данных
 // Функция для загрузки и отображения школ
 function loadSchools(year) {
     markers.clearLayers(); // Очистка карты
-    let filteredData = schoolData.filter(school => school.properties.completed == year);
+    let filteredData = schoolData.filter(school => school.properties.completed <= year);
 
     filteredData.forEach(school => {
         console.log(school.properties); // Проверяем, какие данные есть
