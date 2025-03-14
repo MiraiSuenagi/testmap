@@ -12,11 +12,11 @@ var selectedRegion = "all"; // Выбранный регион
 
 // Функция обновления информации в карточке
 function updateSchoolInfo(filteredData) {
-    document.getElementById("total-schools").textContent = schoolData.length; // Всего школ
-    document.getElementById("filtered-schools").textContent = filteredData.length; // Школ в регионе
-    
+    document.getElementById("total-schools").textContent = schoolData.length;
+    document.getElementById("filtered-schools").textContent = filteredData.length;
+
     let schoolList = document.getElementById("school-list");
-    schoolList.innerHTML = ""; // Очищаем список перед обновлением
+    schoolList.innerHTML = "";
 
     if (filteredData.length === 0) {
         schoolList.innerHTML = "<p>Нет школ в этом регионе.</p>";
@@ -30,18 +30,20 @@ function updateSchoolInfo(filteredData) {
 }
 
 // Функция загрузки и отображения школ
-function loadSchools(year, month) {
+function loadSchools() {
+    let year = parseInt(document.getElementById('timeline-slider').value);
+    let month = parseInt(document.getElementById('month-slider').value);
     markers.clearLayers();
 
     let filteredData = schoolData.filter(school => {
         if (!school.properties.completed) return false;
 
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
-        
+
         // Фильтруем школы, завершенные до текущего месяца
         let isCompleted = completedDate.getFullYear() < year || 
             (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
-        
+
         if (!isCompleted) return false;
 
         // Фильтр по региону
@@ -73,8 +75,8 @@ function loadSchools(year, month) {
         let schoolNames = schoolCounts[coords].join("<br>"); // Объединяем все названия школ в одной точке
 
         var circle = L.circleMarker([lat, lng], {
-            radius: 8 + count * 2, // Размер зависит от количества школ
-            fillColor: "#28a745", // Зеленый цвет
+            radius: 8 + count * 2,
+            fillColor: "#28a745",
             color: "#fff",
             weight: 1,
             opacity: 1,
@@ -91,16 +93,12 @@ function loadSchools(year, month) {
 // Фильтр по регионам
 function applyRegionFilter() {
     selectedRegion = document.getElementById("region-select").value;
-    let selectedYear = parseInt(document.getElementById('timeline-slider').value);
-    let selectedMonth = parseInt(document.getElementById('month-slider').value);
-    loadSchools(selectedYear, selectedMonth);
+    loadSchools();
 }
 
 function resetFilters() {
     selectedRegion = "all";
-    let selectedYear = parseInt(document.getElementById('timeline-slider').value);
-    let selectedMonth = parseInt(document.getElementById('month-slider').value);
-    loadSchools(selectedYear, selectedMonth);
+    loadSchools();
 }
 
 // Загрузка данных
@@ -109,23 +107,47 @@ fetch('schools.json')
     .then(data => {
         schoolData = data;
         console.log("Данные школ загружены:", schoolData);
-        document.getElementById("total-schools").textContent = schoolData.length; // Устанавливаем общее количество школ
-        loadSchools(2024, 1);
+        document.getElementById("total-schools").textContent = schoolData.length;
+        loadSchools();
     })
     .catch(error => console.error('Ошибка загрузки данных:', error));
 
 // Обработка изменения ползунков
-document.getElementById('timeline-slider').addEventListener('input', function () {
-    let selectedYear = parseInt(this.value);
-    let selectedMonth = parseInt(document.getElementById('month-slider').value);
-    loadSchools(selectedYear, selectedMonth);
-});
+document.getElementById('timeline-slider').addEventListener('input', loadSchools);
+document.getElementById('month-slider').addEventListener('input', loadSchools);
 
-document.getElementById('month-slider').addEventListener('input', function () {
-    let selectedYear = parseInt(document.getElementById('timeline-slider').value);
-    let selectedMonth = parseInt(this.value);
-    loadSchools(selectedYear, selectedMonth);
-});
+// Автоматическое движение ползунков
+let playing = true;
+let yearSlider = document.getElementById('timeline-slider');
+let monthSlider = document.getElementById('month-slider');
+let currentYear = parseInt(yearSlider.min);
+let maxYear = parseInt(yearSlider.max);
+let currentMonth = 1;
+
+function autoPlaySlider() {
+    let interval = setInterval(() => {
+        if (!playing) return;
+
+        if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+        }
+        if (currentYear > maxYear) {
+            currentYear = parseInt(yearSlider.min);
+        }
+
+        monthSlider.value = currentMonth;
+        yearSlider.value = currentYear;
+        loadSchools(); // Перерисовываем карту при изменении
+
+        currentMonth++;
+    }, 1000);
+
+    document.getElementById("toggleAnimation").addEventListener("click", function () {
+        playing = !playing;
+        this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
+    });
+}
 
 autoPlaySlider();
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
