@@ -52,7 +52,7 @@ function loadSchools(year, month) {
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2, // Размер зависит от количества школ
-            fillColor: "#007bff",
+            fillColor: "#28a745",
             color: "#fff",
             weight: 1,
             opacity: 1,
