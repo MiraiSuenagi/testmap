@@ -23,7 +23,7 @@ function autoPlaySlider() {
         if (!playing) return;
 
         currentMonth++;
-        if (currentMonth > 13) { // 13 - Январь 2026
+        if (currentMonth > 12) {
             currentMonth = 1;
             currentYear++;
         }
@@ -34,6 +34,7 @@ function autoPlaySlider() {
         monthSlider.value = currentMonth;
         yearSlider.value = currentYear;
         loadSchools(); // Обновляем карту
+
     }, 1000);
 }
 
@@ -58,12 +59,8 @@ function updateSchoolInfo(filteredData) {
 
 // Функция загрузки и отображения школ
 function loadSchools() {
-    let monthIndex = parseInt(monthSlider.value) - 1; // Январь 2024 = 0, Январь 2026 = 12
-    let year = 2023 + Math.floor(monthIndex / 12);
-    let month = monthIndex % 12;
-
-    console.log(`Год: ${year}, Месяц: ${month + 1}`);
-
+    let year = parseInt(yearSlider.value);
+    let month = parseInt(monthSlider.value);
     markers.clearLayers();
 
     let filteredData = schoolData.filter(school => {
@@ -71,15 +68,21 @@ function loadSchools() {
 
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
 
-        console.log(`Школа: ${school.properties.name}, Дата завершения: ${completedDate}`);
-
+        // Фильтруем школы, завершенные до текущего месяца
         let isCompleted = completedDate.getFullYear() < year || 
-            (completedDate.getFullYear() === year && completedDate.getMonth() <= month);
+            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
 
-        return isCompleted && (selectedRegion === "all" || school.properties.region === selectedRegion);
+        if (!isCompleted) return false;
+
+        // Фильтр по региону
+        if (selectedRegion !== "all" && school.properties.region !== selectedRegion) {
+            return false;
+        }
+
+        return true;
     });
 
-    console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month + 1}`);
+    console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
 
     updateSchoolInfo(filteredData); // Обновляем карточку
 
@@ -154,6 +157,4 @@ document.getElementById("toggleAnimation").addEventListener("click", function ()
     playing = !playing;
     this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
 });
-
-// Обработчик изменения выбора региона
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
