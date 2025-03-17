@@ -23,7 +23,7 @@ function autoPlaySlider() {
         if (!playing) return;
 
         currentMonth++;
-        if (currentMonth > 12) {
+        if (currentMonth > 13) { // 13 - Январь 2026
             currentMonth = 1;
             currentYear++;
         }
@@ -34,7 +34,6 @@ function autoPlaySlider() {
         monthSlider.value = currentMonth;
         yearSlider.value = currentYear;
         loadSchools(); // Обновляем карту
-
     }, 1000);
 }
 
@@ -59,10 +58,9 @@ function updateSchoolInfo(filteredData) {
 
 // Функция загрузки и отображения школ
 function loadSchools() {
-    let year = parseInt(yearSlider.value);
-   let month = parseInt(monthSlider.value) - 1; // Январь 2024 = 0, Январь 2026 = 12
-let year = 2024 + Math.floor(month / 12);
-month = month % 12;
+    let monthIndex = parseInt(monthSlider.value) - 1; // Декабрь 2023 = 0, Январь 2024 = 1
+    let year = 2023 + Math.floor(monthIndex / 12);
+    let month = monthIndex % 12;
 
     markers.clearLayers();
 
@@ -85,8 +83,7 @@ month = month % 12;
         return true;
     });
 
-    console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
-
+    console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month + 1}`);
 
     updateSchoolInfo(filteredData); // Обновляем карточку
 
