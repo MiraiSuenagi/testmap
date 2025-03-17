@@ -71,7 +71,8 @@ function loadSchools() {
 
         // Фильтруем школы, завершенные до текущего месяца
         let isCompleted = completedDate.getFullYear() < year || 
-            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
+    (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
+
 
         if (!isCompleted) return false;
 
