@@ -40,7 +40,8 @@ function autoPlaySlider() {
 
 // Функция обновления информации в карточке
 function updateSchoolInfo(filteredData) {
-    document.getElementById("total-schools").textContent = filteredData.length; // Отображаем количество отфильтрованных школ
+    document.getElementById("total-schools").textContent = schoolData.length;
+    document.getElementById("filtered-schools").textContent = filteredData.length;
 
     let schoolList = document.getElementById("school-list");
     schoolList.innerHTML = "";
@@ -56,29 +57,25 @@ function updateSchoolInfo(filteredData) {
     }
 }
 
-// Функция загрузки школ и фильтрации
+// Функция загрузки и отображения школ
 function loadSchools() {
     let year = parseInt(yearSlider.value);
     let month = parseInt(monthSlider.value);
     markers.clearLayers();
-
-    console.log("Фильтр регионов:", selectedRegion);
 
     let filteredData = schoolData.filter(school => {
         if (!school.properties.completed) return false;
 
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
 
+        // Фильтруем школы, завершенные до текущего месяца
         let isCompleted = completedDate.getFullYear() < year || 
             (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
 
         if (!isCompleted) return false;
 
-        // Извлекаем регион из `name`
-        let schoolRegion = extractRegion(school.properties.name);
-        console.log(`Школа: ${school.properties.name}, Регион: ${schoolRegion}`);
-
-        if (selectedRegion !== "all" && schoolRegion !== selectedRegion) {
+        // Фильтр по региону
+        if (selectedRegion !== "all" && school.properties.region !== selectedRegion) {
             return false;
         }
 
@@ -87,8 +84,9 @@ function loadSchools() {
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
 
-    updateSchoolInfo(filteredData);
+    updateSchoolInfo(filteredData); // Обновляем карточку
 
+    // Группируем школы по координатам
     let schoolCounts = {};
     filteredData.forEach(school => {
         let coords = school.geometry.coordinates.join(',');
@@ -98,10 +96,11 @@ function loadSchools() {
         schoolCounts[coords].push(school.properties.name);
     });
 
+    // Добавляем круги с возможностью клика
     Object.keys(schoolCounts).forEach(coords => {
         let [lng, lat] = coords.split(',').map(Number);
         let count = schoolCounts[coords].length;
-        let schoolNames = schoolCounts[coords].join("<br>");
+        let schoolNames = schoolCounts[coords].join("<br>"); // Объединяем все названия школ в одной точке
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
@@ -119,36 +118,12 @@ function loadSchools() {
     map.addLayer(markers);
 }
 
-// Функция извлечения региона из `name`
-function extractRegion(name) {
-    let regions = [
-        "Абайская область", "Акмолинская область", "Актюбинская область", "Алматинская область",
-        "Атырауская область", "Восточно-Казахстанская область", "Жамбылская область", "Жетысуская область",
-        "Западно-Казахстанская область", "Карагандинская область", "Костанайская область",
-        "Кызылординская область", "Мангистауская область", "Павлодарская область",
-        "Северо-Казахстанская область", "Туркестанская область", "Улытауская область",
-        "Астана", "Алматы", "Шымкент"
-    ];
-
-    for (let region of regions) {
-        if (name.includes(region)) {
-            return region;
-        }
-    }
-
-    // Область Абай иногда записывается просто как "область Абай"
-    if (name.includes("область Абай")) return "Абайская область";
-
-    return "Неизвестный регион";
-}
-
 // Фильтр по регионам
 function applyRegionFilter() {
     selectedRegion = document.getElementById("region-select").value;
     loadSchools();
 }
 
-// Сброс фильтров
 function resetFilters() {
     selectedRegion = "all";
     loadSchools();
@@ -160,6 +135,7 @@ fetch('schools.json')
     .then(data => {
         schoolData = data;
         console.log("Данные школ загружены:", schoolData);
+        document.getElementById("total-schools").textContent = schoolData.length;
         loadSchools();
         autoPlaySlider(); // Запускаем анимацию после загрузки данных
     })
@@ -181,6 +157,4 @@ document.getElementById("toggleAnimation").addEventListener("click", function ()
     playing = !playing;
     this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
 });
-
-// Добавляем обработчик для выбора региона
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
