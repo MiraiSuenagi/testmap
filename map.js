@@ -40,8 +40,7 @@ function autoPlaySlider() {
 
 // Функция обновления информации в карточке
 function updateSchoolInfo(filteredData) {
-    document.getElementById("total-schools").textContent = schoolData.length;
-    document.getElementById("filtered-schools").textContent = filteredData.length;
+    document.getElementById("total-schools").textContent = filteredData.length; // Отображаем количество отфильтрованных школ
 
     let schoolList = document.getElementById("school-list");
     schoolList.innerHTML = "";
@@ -57,6 +56,7 @@ function updateSchoolInfo(filteredData) {
     }
 }
 
+// Функция загрузки школ и фильтрации
 function loadSchools() {
     let year = parseInt(yearSlider.value);
     let month = parseInt(monthSlider.value);
@@ -135,11 +135,11 @@ function extractRegion(name) {
             return region;
         }
     }
-    return "Неизвестный регион";
-}
 
-}
-ap.addLayer(markers);
+    // Область Абай иногда записывается просто как "область Абай"
+    if (name.includes("область Абай")) return "Абайская область";
+
+    return "Неизвестный регион";
 }
 
 // Фильтр по регионам
@@ -148,6 +148,7 @@ function applyRegionFilter() {
     loadSchools();
 }
 
+// Сброс фильтров
 function resetFilters() {
     selectedRegion = "all";
     loadSchools();
@@ -159,7 +160,6 @@ fetch('schools.json')
     .then(data => {
         schoolData = data;
         console.log("Данные школ загружены:", schoolData);
-        document.getElementById("total-schools").textContent = schoolData.length;
         loadSchools();
         autoPlaySlider(); // Запускаем анимацию после загрузки данных
     })
@@ -181,4 +181,6 @@ document.getElementById("toggleAnimation").addEventListener("click", function ()
     playing = !playing;
     this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
 });
+
+// Добавляем обработчик для выбора региона
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
