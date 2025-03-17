@@ -8,6 +8,13 @@ var markers = L.layerGroup();
 var schoolData = [];
 var selectedRegion = "all";
 let currentProject = "comfort";
+let minYear = 2024, maxYear = 2025;
+
+// Ползунки времени
+let yearSlider = document.getElementById('timeline-slider');
+let monthSlider = document.getElementById('month-slider');
+let currentYear = parseInt(yearSlider.value);
+let currentMonth = parseInt(monthSlider.value);
 
 // Функция переключения проектов
 function switchProject(project) {
@@ -27,15 +34,36 @@ function switchProject(project) {
         .then(response => response.json())
         .then(data => {
             schoolData = data;
+            updateTimelineRange();  // Обновляем годы
             loadSchools();
         })
         .catch(error => console.error('Ошибка загрузки данных:', error));
 }
 
+// Обновляем границы ползунка в зависимости от данных проекта
+function updateTimelineRange() {
+    let years = schoolData.map(s => new Date(s.properties.completed).getFullYear());
+    minYear = Math.min(...years);
+    maxYear = Math.max(...years);
+
+    yearSlider.min = minYear;
+    yearSlider.max = maxYear;
+    yearSlider.value = minYear;
+    document.querySelector(".labels").innerHTML = `<span>${minYear}</span><span>${maxYear}</span>`;
+
+    currentYear = minYear;
+}
+
 // Функция загрузки школ
 function loadSchools() {
     markers.clearLayers();
-    let filteredData = schoolData.filter(school => selectedRegion === "all" || school.properties.region === selectedRegion);
+    let year = parseInt(yearSlider.value);
+    let month = parseInt(monthSlider.value);
+
+    let filteredData = schoolData.filter(school => {
+        let schoolYear = new Date(school.properties.completed).getFullYear();
+        return schoolYear === year && (selectedRegion === "all" || school.properties.region === selectedRegion);
+    });
 
     document.getElementById("total-schools").textContent = schoolData.length;
     document.getElementById("filtered-schools").textContent = filteredData.length;
@@ -68,5 +96,16 @@ function resetFilters() {
     loadSchools();
 }
 
-// Загрузка данных при старте
+// Автообновление карты при движении ползунка
+yearSlider.addEventListener('input', () => {
+    currentYear = parseInt(yearSlider.value);
+    loadSchools();
+});
+
+monthSlider.addEventListener('input', () => {
+    currentMonth = parseInt(monthSlider.value);
+    loadSchools();
+});
+
+// Загружаем первый проект при старте
 switchProject("comfort");
