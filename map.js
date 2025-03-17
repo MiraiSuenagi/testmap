@@ -60,7 +60,10 @@ function updateSchoolInfo(filteredData) {
 // Функция загрузки и отображения школ
 function loadSchools() {
     let year = parseInt(yearSlider.value);
-    let month = parseInt(monthSlider.value);
+   let month = parseInt(monthSlider.value) - 1; // Январь 2024 = 0, Январь 2026 = 12
+let year = 2024 + Math.floor(month / 12);
+month = month % 12;
+
     markers.clearLayers();
 
     let filteredData = schoolData.filter(school => {
