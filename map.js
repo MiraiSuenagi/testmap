@@ -70,8 +70,8 @@ function loadSchools() {
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
 
         // Фильтруем школы, завершенные до текущего месяца
-        let isCompleted = completedDate.getFullYear() < year || 
-    (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
+        let isCompleted = completedDate <= new Date(year, month + 1, 0);
+
 
 
         if (!isCompleted) return false;
