@@ -158,4 +158,6 @@ document.getElementById("toggleAnimation").addEventListener("click", function ()
     playing = !playing;
     this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
 });
+
+// Обработчик изменения выбора региона
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
