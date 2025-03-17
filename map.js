@@ -62,6 +62,8 @@ function loadSchools() {
     let year = 2023 + Math.floor(monthIndex / 12);
     let month = monthIndex % 12;
 
+    console.log(`Год: ${year}, Месяц: ${month + 1}`);
+
     markers.clearLayers();
 
     let filteredData = schoolData.filter(school => {
@@ -69,19 +71,12 @@ function loadSchools() {
 
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
 
-        // Фильтруем школы, завершенные до текущего месяца
-        let isCompleted = completedDate <= new Date(year, month + 1, 0);
+        console.log(`Школа: ${school.properties.name}, Дата завершения: ${completedDate}`);
 
+        let isCompleted = completedDate.getFullYear() < year || 
+            (completedDate.getFullYear() === year && completedDate.getMonth() <= month);
 
-
-        if (!isCompleted) return false;
-
-        // Фильтр по региону
-        if (selectedRegion !== "all" && school.properties.region !== selectedRegion) {
-            return false;
-        }
-
-        return true;
+        return isCompleted && (selectedRegion === "all" || school.properties.region === selectedRegion);
     });
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month + 1}`);
