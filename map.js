@@ -57,28 +57,28 @@ function updateSchoolInfo(filteredData) {
     }
 }
 
-// Функция загрузки и отображения школ
 function loadSchools() {
     let year = parseInt(yearSlider.value);
     let month = parseInt(monthSlider.value);
     markers.clearLayers();
 
     console.log("Фильтр регионов:", selectedRegion);
-    console.log("Все регионы в данных:", [...new Set(schoolData.map(s => s.properties.region))]);
 
     let filteredData = schoolData.filter(school => {
         if (!school.properties.completed) return false;
 
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
 
-        // Фильтруем школы, завершенные до текущего месяца
         let isCompleted = completedDate.getFullYear() < year || 
             (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
 
         if (!isCompleted) return false;
 
-        // Фильтр по региону (приводим к нижнему регистру для надежности)
-        if (selectedRegion !== "all" && school.properties.region.toLowerCase() !== selectedRegion.toLowerCase()) {
+        // Извлекаем регион из `name`
+        let schoolRegion = extractRegion(school.properties.name);
+        console.log(`Школа: ${school.properties.name}, Регион: ${schoolRegion}`);
+
+        if (selectedRegion !== "all" && schoolRegion !== selectedRegion) {
             return false;
         }
 
@@ -87,9 +87,8 @@ function loadSchools() {
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
 
-    updateSchoolInfo(filteredData); // Обновляем карточку
+    updateSchoolInfo(filteredData);
 
-    // Группируем школы по координатам
     let schoolCounts = {};
     filteredData.forEach(school => {
         let coords = school.geometry.coordinates.join(',');
@@ -99,11 +98,10 @@ function loadSchools() {
         schoolCounts[coords].push(school.properties.name);
     });
 
-    // Добавляем круги с возможностью клика
     Object.keys(schoolCounts).forEach(coords => {
         let [lng, lat] = coords.split(',').map(Number);
         let count = schoolCounts[coords].length;
-        let schoolNames = schoolCounts[coords].join("<br>"); // Объединяем все названия школ в одной точке
+        let schoolNames = schoolCounts[coords].join("<br>");
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
@@ -119,6 +117,27 @@ function loadSchools() {
     });
 
     map.addLayer(markers);
+}
+
+// Функция извлечения региона из `name`
+function extractRegion(name) {
+    let regions = [
+        "Абайская область", "Акмолинская область", "Актюбинская область", "Алматинская область",
+        "Атырауская область", "Восточно-Казахстанская область", "Жамбылская область", "Жетысуская область",
+        "Западно-Казахстанская область", "Карагандинская область", "Костанайская область",
+        "Кызылординская область", "Мангистауская область", "Павлодарская область",
+        "Северо-Казахстанская область", "Туркестанская область", "Улытауская область",
+        "Астана", "Алматы", "Шымкент"
+    ];
+
+    for (let region of regions) {
+        if (name.includes(region)) {
+            return region;
+        }
+    }
+    return "Неизвестный регион";
+}
+
 }
 ap.addLayer(markers);
 }
