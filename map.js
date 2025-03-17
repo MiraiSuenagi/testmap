@@ -59,7 +59,7 @@ function updateSchoolInfo(filteredData) {
 // Функция загрузки и отображения школ
 function loadSchools() {
     let monthIndex = parseInt(monthSlider.value) - 1; // Декабрь 2023 = 0, Январь 2024 = 1
-    let year = 2023 + Math.floor(monthIndex / 12);
+    let yearCalculated = 2023 + Math.floor(monthIndex / 12);
     let month = monthIndex % 12;
 
     markers.clearLayers();
@@ -70,8 +70,8 @@ function loadSchools() {
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
 
         // Фильтруем школы, завершенные до текущего месяца
-        let isCompleted = completedDate.getFullYear() < year || 
-            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
+        let isCompleted = completedDate.getFullYear() < yearCalculated || 
+            (completedDate.getFullYear() === yearCalculated && completedDate.getMonth() + 1 <= month);
 
         if (!isCompleted) return false;
 
@@ -83,7 +83,7 @@ function loadSchools() {
         return true;
     });
 
-    console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month + 1}`);
+    console.log(`Школ отфильтровано: ${filteredData.length} за ${yearCalculated}-${month + 1}`);
 
     updateSchoolInfo(filteredData); // Обновляем карточку
 
