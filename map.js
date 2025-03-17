@@ -63,6 +63,9 @@ function loadSchools() {
     let month = parseInt(monthSlider.value);
     markers.clearLayers();
 
+    console.log("Фильтр регионов:", selectedRegion);
+    console.log("Все регионы в данных:", [...new Set(schoolData.map(s => s.properties.region))]);
+
     let filteredData = schoolData.filter(school => {
         if (!school.properties.completed) return false;
 
@@ -74,8 +77,8 @@ function loadSchools() {
 
         if (!isCompleted) return false;
 
-        // Фильтр по региону
-        if (selectedRegion !== "all" && school.properties.region !== selectedRegion) {
+        // Фильтр по региону (приводим к нижнему регистру для надежности)
+        if (selectedRegion !== "all" && school.properties.region.toLowerCase() !== selectedRegion.toLowerCase()) {
             return false;
         }
 
@@ -116,6 +119,8 @@ function loadSchools() {
     });
 
     map.addLayer(markers);
+}
+ap.addLayer(markers);
 }
 
 // Фильтр по регионам
