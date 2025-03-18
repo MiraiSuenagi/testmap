@@ -14,28 +14,34 @@ var selectedRegion = "all"; // Выбранный регион
 let playing = true;
 let yearSlider = document.getElementById('timeline-slider');
 let monthSlider = document.getElementById('month-slider');
-let currentYear = parseInt(yearSlider.value);
-let maxYear = parseInt(yearSlider.max);
-let currentMonth = parseInt(monthSlider.value);
 
-function autoPlaySlider() {
-    let interval = setInterval(() => {
-        if (!playing) return;
+if (!yearSlider || !monthSlider) {
+    console.error("Ошибка: Ползунки не найдены! Проверь ID элементов в HTML.");
+} else {
+    let currentYear = parseInt(yearSlider.value);
+    let maxYear = parseInt(yearSlider.max);
+    let currentMonth = parseInt(monthSlider.value);
 
-        currentMonth++;
-        if (currentMonth > 12) {
-            currentMonth = 1;
-            currentYear++;
-        }
-        if (currentYear > maxYear) {
-            currentYear = parseInt(yearSlider.min);
-        }
+    function autoPlaySlider() {
+        let interval = setInterval(() => {
+            if (!playing) return;
 
-        monthSlider.value = currentMonth;
-        yearSlider.value = currentYear;
-        loadSchools(); // Обновляем карту
+            currentMonth++;
+            if (currentMonth > 12) {
+                currentMonth = 1;
+                currentYear++;
+            }
+            if (currentYear > maxYear) {
+                currentYear = parseInt(yearSlider.min);
+            }
 
-    }, 1000);
+            monthSlider.value = currentMonth;
+            yearSlider.value = currentYear;
+            loadSchools(); // Обновляем карту
+        }, 1000);
+    }
+
+    autoPlaySlider();
 }
 
 // Функция обновления информации в карточке
@@ -59,34 +65,25 @@ function updateSchoolInfo(filteredData) {
 
 // Функция загрузки и отображения школ
 function loadSchools() {
+    if (!yearSlider || !monthSlider) return;
+
     let year = parseInt(yearSlider.value);
     let month = parseInt(monthSlider.value);
     markers.clearLayers();
 
     let filteredData = schoolData.filter(school => {
         if (!school.properties.completed) return false;
-
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
-
-        // Фильтруем школы, завершенные до текущего месяца
         let isCompleted = completedDate.getFullYear() < year || 
             (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
-
         if (!isCompleted) return false;
-
-        // Фильтр по региону
-        if (selectedRegion !== "all" && school.properties.region !== selectedRegion) {
-            return false;
-        }
-
+        if (selectedRegion !== "all" && school.properties.region !== selectedRegion) return false;
         return true;
     });
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
+    updateSchoolInfo(filteredData);
 
-    updateSchoolInfo(filteredData); // Обновляем карточку
-
-    // Группируем школы по координатам
     let schoolCounts = {};
     filteredData.forEach(school => {
         let coords = school.geometry.coordinates.join(',');
@@ -96,11 +93,10 @@ function loadSchools() {
         schoolCounts[coords].push(school.properties.name);
     });
 
-    // Добавляем круги с возможностью клика
     Object.keys(schoolCounts).forEach(coords => {
         let [lng, lat] = coords.split(',').map(Number);
         let count = schoolCounts[coords].length;
-        let schoolNames = schoolCounts[coords].join("<br>"); // Объединяем все названия школ в одной точке
+        let schoolNames = schoolCounts[coords].join("<br>");
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
@@ -137,24 +133,28 @@ fetch('schools.json')
         console.log("Данные школ загружены:", schoolData);
         document.getElementById("total-schools").textContent = schoolData.length;
         loadSchools();
-        autoPlaySlider(); // Запускаем анимацию после загрузки данных
     })
     .catch(error => console.error('Ошибка загрузки данных:', error));
 
-// Обработка изменения ползунков
-yearSlider.addEventListener('input', () => {
-    currentYear = parseInt(yearSlider.value);
-    loadSchools();
-});
+if (yearSlider && monthSlider) {
+    yearSlider.addEventListener('input', () => {
+        currentYear = parseInt(yearSlider.value);
+        loadSchools();
+    });
 
-monthSlider.addEventListener('input', () => {
-    currentMonth = parseInt(monthSlider.value);
-    loadSchools();
-});
+    monthSlider.addEventListener('input', () => {
+        currentMonth = parseInt(monthSlider.value);
+        loadSchools();
+    });
+}
 
-// Добавляем обработчик для кнопки паузы/старта
-document.getElementById("toggleAnimation").addEventListener("click", function () {
-    playing = !playing;
-    this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
-});
+// Кнопка паузы/старта
+let toggleButton = document.getElementById("toggleAnimation");
+if (toggleButton) {
+    toggleButton.addEventListener("click", function () {
+        playing = !playing;
+        this.innerText = playing ? "⏸ Пауза" : "▶️ Старт";
+    });
+}
+
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
