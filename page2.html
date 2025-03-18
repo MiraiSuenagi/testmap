@@ -15,6 +15,26 @@
             height: 100vh;
         }
 
+        /* Кнопка переключения страниц */
+        #switch-page-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        #switch-page-btn:hover {
+            background: #0056b3;
+        }
+
         /* Левая панель */
         #sidebar {
             width: 300px;
@@ -61,7 +81,7 @@
         }
 
         /* Карточка информации */
-        #school-info {
+        #project-info {
             margin-top: 20px;
             padding: 10px;
             background: #fff;
@@ -70,7 +90,7 @@
             text-align: left;
         }
 
-        #school-list {
+        #project-list {
             max-height: 200px;
             overflow-y: auto;
             border: 1px solid #ddd;
@@ -132,81 +152,70 @@
             font-size: 16px;
             font-weight: bold;
         }
+        
         /* кнопка пауза/старт */
         #toggleAnimation {
-        width: 100px; 
-        height: 25px;
-        text-align: center;
-    }
-
+            width: 100px;
+            height: 25px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Кнопка переключения обратно на index.html -->
+    <button id="switch-page-btn" onclick="switchToIndex()">Переключить на школы</button>
 
     <!-- Левая панель -->
     <div id="sidebar">
         <h3>Фильтры</h3>
         <label for="region-select">Выберите регион:</label>
-     <select id="region-select">
-    <option value="all">Все регионы</option>
-    <option value="Абайская область">Абайская область</option>
-    <option value="Акмолинская область">Акмолинская область</option>
-    <option value="Актюбинская область">Актюбинская область</option>
-    <option value="Алматинская область">Алматинская область</option>
-    <option value="Атырауская область">Атырауская область</option>
-    <option value="Восточно-Казахстанская область">Восточно-Казахстанская область</option>
-    <option value="Жамбылская область">Жамбылская область</option>
-    <option value="Жетысуская область">Жетысуская область</option>
-    <option value="Западно-Казахстанская область">Западно-Казахстанская область</option>
-    <option value="Карагандинская область">Карагандинская область</option>
-    <option value="Костанайская область">Костанайская область</option>
-    <option value="Кызылординская область">Кызылординская область</option>
-    <option value="Мангистауская область">Мангистауская область</option>
-    <option value="Павлодарская область">Павлодарская область</option>
-    <option value="Северо-Казахстанская область">Северо-Казахстанская область</option>
-    <option value="Туркестанская область">Туркестанская область</option>
-    <option value="Улытауская область">Улытауская область</option>
-    <option value="Астана">г. Астана</option>
-    <option value="Алматы">г. Алматы</option>
-    <option value="Шымкент">г. Шымкент</option>
-</select>
+        <select id="region-select">
+            <option value="all">Все регионы</option>
+            <option value="Абайская область">Абайская область</option>
+            <option value="Акмолинская область">Акмолинская область</option>
+            <option value="Актюбинская область">Актюбинская область</option>
+            <option value="Алматинская область">Алматинская область</option>
+            <option value="Атырауская область">Атырауская область</option>
+            <option value="Восточно-Казахстанская область">Восточно-Казахстанская область</option>
+            <option value="Жамбылская область">Жамбылская область</option>
+            <option value="Жетысуская область">Жетысуская область</option>
+            <option value="Западно-Казахстанская область">Западно-Казахстанская область</option>
+            <option value="Карагандинская область">Карагандинская область</option>
+            <option value="Костанайская область">Костанайская область</option>
+            <option value="Кызылординская область">Кызылординская область</option>
+            <option value="Мангистауская область">Мангистауская область</option>
+            <option value="Павлодарская область">Павлодарская область</option>
+            <option value="Северо-Казахстанская область">Северо-Казахстанская область</option>
+            <option value="Туркестанская область">Туркестанская область</option>
+            <option value="Улытауская область">Улытауская область</option>
+            <option value="Астана">г. Астана</option>
+            <option value="Алматы">г. Алматы</option>
+            <option value="Шымкент">г. Шымкент</option>
+        </select>
         <button class="filter-btn" onclick="applyRegionFilter()">Применить</button>
         <button class="filter-btn reset" onclick="resetFilters()">Сбросить</button>
 
         <!-- Карточка с информацией о проектах -->
-<div id="project-info">
-    <h4>Общее количество проектов: <span id="total-projects">0</span></h4>
-    <h4>Проектов в регионе: <span id="filtered-projects">0</span></h4>
-    <div id="project-list"></div>
-</div>
-
+        <div id="project-info">
+            <h4>Общее количество проектов: <span id="total-projects">0</span></h4>
+            <h4>Проектов в регионе: <span id="filtered-projects">0</span></h4>
+            <div id="project-list"></div>
+        </div>
+    </div>
 
     <!-- Основной контейнер -->
     <div id="main-container">
         <h2>Национальный проект «Модернизация сельского здравоохранения»</h2>
         <div id="map"></div>
-
-        <div id="controls">
-            <div class="slider-container">
-                <label for="timeline-slider">Выберите год:</label>
-                <input type="range" id="timeline-slider" min="2023" avg="2024" max="2025" step="1" value="2023">
-                <div class="labels"><span>2023</span><span>2024</span><span>2025</span></div>
-            </div>
-
-            <div class="slider-container">
-                <label for="month-slider">Выберите месяц:</label>
-                <input type="range" id="month-slider" min="1" max="12" step="1" value="1">
-                <div class="labels">
-                    <span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span>
-                    <span>Май</span><span>Июн</span><span>Июл</span><span>Авг</span>
-                    <span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
-                </div>
-            </div>
-            <button id="toggleAnimation">⏸ Пауза</button>
-        </div>
     </div>
 
     <script src="projects_map.js" defer></script>
+    <script>
+        function switchToIndex() {
+            window.location.href = "index.html";
+        }
+    </script>
 
 </body>
 </html>
