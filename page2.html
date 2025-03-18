@@ -208,6 +208,25 @@
     <div id="main-container">
         <h2>Национальный проект «Модернизация сельского здравоохранения»</h2>
         <div id="map"></div>
+        <div id="controls">
+    <div class="slider-container">
+        <label for="timeline-slider">Выберите год:</label>
+        <input type="range" id="timeline-slider" min="2023" max="2025" step="1" value="2023">
+        <div class="labels"><span>2023</span><span>2024</span><span>2025</span></div>
+    </div>
+
+    <div class="slider-container">
+        <label for="month-slider">Выберите месяц:</label>
+        <input type="range" id="month-slider" min="1" max="12" step="1" value="1">
+        <div class="labels">
+            <span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span>
+            <span>Май</span><span>Июн</span><span>Июл</span><span>Авг</span>
+            <span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
+        </div>
+    </div>
+    <button id="toggleAnimation">⏸ Пауза</button>
+</div>
+
     </div>
 
     <script src="projects_map.js" defer></script>
