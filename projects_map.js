@@ -7,6 +7,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 var markers = L.layerGroup();
+map.addLayer(markers); // Добавляем слой маркеров на карту
+
 var projectData = [];
 var selectedRegion = "all"; // Выбранный регион
 
@@ -84,22 +86,34 @@ function loadProjects() {
     console.log(`Проектов отфильтровано: ${filteredData.length} за ${year}-${month}`);
     updateProjectInfo(filteredData);
 
-   filteredData.forEach(project => {
-    let [lng, lat] = project.geometry.coordinates;
+    let projectCounts = {};
+    filteredData.forEach(project => {
+        let coords = project.geometry.coordinates.join(',');
+        if (!projectCounts[coords]) {
+            projectCounts[coords] = [];
+        }
+        projectCounts[coords].push(project.properties.name);
+    });
 
-    var circle = L.circleMarker([lat, lng], {
-        radius: 8,
-        fillColor: "#28a745", // Зеленый цвет, как на index.html
-        color: "#fff",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8,
-        interactive: true
-    }).bindPopup(`<b>${project.properties.name}</b><br>${project.properties.description}`);
+    Object.keys(projectCounts).forEach(coords => {
+        let [lng, lat] = coords.split(',').map(Number);
+        let count = projectCounts[coords].length;
+        let projectNames = projectCounts[coords].join("<br>");
 
-    markers.addLayer(circle);
-});
+        var circle = L.circleMarker([lat, lng], {
+            radius: 8 + count * 2, // Радиус увеличивается в зависимости от количества проектов
+            fillColor: "#28a745", // Зеленый цвет, как на index.html
+            color: "#fff",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8,
+            interactive: true
+        }).bindPopup(`<b>Проекты:</b><br>${projectNames}`);
 
+        markers.addLayer(circle);
+    });
+
+    map.addLayer(markers);
 }
 
 // Фильтр по регионам
