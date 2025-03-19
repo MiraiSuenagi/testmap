@@ -84,14 +84,22 @@ function loadProjects() {
     console.log(`Проектов отфильтровано: ${filteredData.length} за ${year}-${month}`);
     updateProjectInfo(filteredData);
 
-    filteredData.forEach(project => {
-        let [lng, lat] = project.geometry.coordinates;
-        let marker = L.marker([lat, lng])
-            .bindPopup(`<b>${project.properties.name}</b><br>${project.properties.description}`);
-        markers.addLayer(marker);
-    });
+   filteredData.forEach(project => {
+    let [lng, lat] = project.geometry.coordinates;
 
-    map.addLayer(markers);
+    var circle = L.circleMarker([lat, lng], {
+        radius: 8,
+        fillColor: "#28a745", // Зеленый цвет, как на index.html
+        color: "#fff",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8,
+        interactive: true
+    }).bindPopup(`<b>${project.properties.name}</b><br>${project.properties.description}`);
+
+    markers.addLayer(circle);
+});
+
 }
 
 // Фильтр по регионам
