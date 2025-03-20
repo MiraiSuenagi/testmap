@@ -74,13 +74,9 @@ function loadProjects() {
     markers.clearLayers();
 
     let filteredData = projectData.filter(project => {
-        if (!project.properties.completed) return false;
         let completedDate = new Date(String(project.properties.completed).replace(".0", "-01-01"));
-        let isCompleted = completedDate.getFullYear() < year || 
-            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
-        if (!isCompleted) return false;
         if (selectedRegion !== "all" && project.properties.region !== selectedRegion) return false;
-        return true;
+        return true; // Показываем все проекты
     });
 
     console.log(`Проектов отфильтровано: ${filteredData.length} за ${year}-${month}`);
@@ -92,17 +88,22 @@ function loadProjects() {
         if (!projectCounts[coords]) {
             projectCounts[coords] = [];
         }
-        projectCounts[coords].push(project.properties.name);
+        projectCounts[coords].push(project);
     });
 
     Object.keys(projectCounts).forEach(coords => {
         let [lng, lat] = coords.split(',').map(Number);
         let count = projectCounts[coords].length;
-        let projectNames = projectCounts[coords].join("<br>");
+        let projectNames = projectCounts[coords].map(p => p.properties.name).join("<br>");
+
+        var currentDate = new Date(year, month - 1); // Текущая дата на шкале
+        var completedDate = new Date(String(projectCounts[coords][0].properties.completed).replace(".0", "-01-01")); 
+
+        var markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый если завершено, иначе красный
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2, // Радиус увеличивается в зависимости от количества проектов
-            fillColor: "#28a745", // Зеленый цвет, как на index.html
+            fillColor: markerColor,
             color: "#fff",
             weight: 1,
             opacity: 1,
