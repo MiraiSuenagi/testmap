@@ -1,4 +1,4 @@
-// Инициализация карты для page2.html
+// Инициализация карты
 var map = L.map('map').setView([48.0196, 66.9237], 5);
 
 // Добавление слоя карты (OpenStreetMap)
@@ -7,8 +7,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 var markers = L.layerGroup();
-map.addLayer(markers); // Добавляем слой маркеров на карту
-
 var projectData = [];
 var selectedRegion = "all"; // Выбранный регион
 
@@ -20,14 +18,14 @@ let monthSlider = document.getElementById('month-slider');
 if (!yearSlider || !monthSlider) {
     console.error("Ошибка: Ползунки не найдены! Проверь ID элементов в HTML.");
 } else {
-    let currentYear = parseInt(yearSlider.value);
-    let maxYear = parseInt(yearSlider.max);
-    let currentMonth = parseInt(monthSlider.value);
-
     function autoPlaySlider() {
         let interval = setInterval(() => {
             if (!playing) return;
-
+            
+            let currentYear = parseInt(yearSlider.value);
+            let maxYear = parseInt(yearSlider.max);
+            let currentMonth = parseInt(monthSlider.value);
+            
             currentMonth++;
             if (currentMonth > 12) {
                 currentMonth = 1;
@@ -39,30 +37,10 @@ if (!yearSlider || !monthSlider) {
 
             monthSlider.value = currentMonth;
             yearSlider.value = currentYear;
-            loadProjects(); // Обновляем карту
+            loadProjects();
         }, 1000);
     }
-
     autoPlaySlider();
-}
-
-// Функция обновления информации в карточке
-function updateProjectInfo(filteredData) {
-    document.getElementById("total-projects").textContent = projectData.length;
-    document.getElementById("filtered-projects").textContent = filteredData.length;
-
-    let projectList = document.getElementById("project-list");
-    projectList.innerHTML = "";
-
-    if (filteredData.length === 0) {
-        projectList.innerHTML = "<p>Нет проектов в этом регионе.</p>";
-    } else {
-        filteredData.forEach(project => {
-            let projectItem = document.createElement("div");
-            projectItem.textContent = project.properties.name;
-            projectList.appendChild(projectItem);
-        });
-    }
 }
 
 // Функция загрузки и отображения проектов
@@ -73,17 +51,30 @@ function loadProjects() {
     let month = parseInt(monthSlider.value);
     markers.clearLayers();
 
+    let currentDate = new Date(year, month - 1);
+    
     let filteredData = projectData.filter(project => {
         let completedDate = new Date(String(project.properties.completed).replace(".0", "-01-01"));
+        
+        // Фильтр по региону
         if (selectedRegion !== "all" && project.properties.region !== selectedRegion) return false;
+        
         return true; // Показываем все объекты
     });
 
     console.log(`Проектов отфильтровано: ${filteredData.length} за ${year}-${month}`);
+    
+    // Фильтрация завершенных проектов
+    let completedProjects = filteredData.filter(project => {
+        let completedDate = new Date(String(project.properties.completed).replace(".0", "-01-01"));
+        return completedDate <= currentDate;
+    });
 
-    let greenProjectsCount = 0; // Счетчик зеленых маркеров
+    document.getElementById("filtered-projects").textContent = completedProjects.length; // Только завершенные проекты
+
+    document.getElementById("project-list").innerHTML = "";
+
     let projectCounts = {};
-
     filteredData.forEach(project => {
         let coords = project.geometry.coordinates.join(',');
         if (!projectCounts[coords]) {
@@ -97,14 +88,8 @@ function loadProjects() {
         let count = projectCounts[coords].length;
         let projectNames = projectCounts[coords].map(p => p.properties.name).join("<br>");
 
-        var currentDate = new Date(year, month - 1);
-        var completedDate = new Date(String(projectCounts[coords][0].properties.completed).replace(".0", "-01-01"));
-
-        var markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый если завершено, иначе красный
-
-        if (markerColor === "#28a745") {
-            greenProjectsCount += count; // Учитываем все завершенные проекты
-        }
+        let completedDate = new Date(String(projectCounts[coords][0].properties.completed).replace(".0", "-01-01"));
+        let markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый - завершенные, красный - незавершенные
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
@@ -120,11 +105,24 @@ function loadProjects() {
     });
 
     map.addLayer(markers);
-
-    // Обновляем количество завершенных проектов
-    document.getElementById("filtered-projects").textContent = greenProjectsCount;
+    updateProjectList(completedProjects);
 }
 
+// Функция обновления списка проектов
+function updateProjectList(projects) {
+    let projectList = document.getElementById("project-list");
+    projectList.innerHTML = "";
+
+    if (projects.length === 0) {
+        projectList.innerHTML = "<p>Нет завершенных проектов в этом регионе.</p>";
+    } else {
+        projects.forEach(project => {
+            let projectItem = document.createElement("div");
+            projectItem.textContent = project.properties.name;
+            projectList.appendChild(projectItem);
+        });
+    }
+}
 
 // Фильтр по регионам
 function applyRegionFilter() {
@@ -141,7 +139,7 @@ function resetFilters() {
 fetch('projects.json')
     .then(response => response.json())
     .then(data => {
-        projectData = data.features;
+        projectData = data;
         console.log("Данные проектов загружены:", projectData);
         document.getElementById("total-projects").textContent = projectData.length;
         loadProjects();
@@ -149,15 +147,8 @@ fetch('projects.json')
     .catch(error => console.error('Ошибка загрузки данных:', error));
 
 if (yearSlider && monthSlider) {
-    yearSlider.addEventListener('input', () => {
-        currentYear = parseInt(yearSlider.value);
-        loadProjects();
-    });
-
-    monthSlider.addEventListener('input', () => {
-        currentMonth = parseInt(monthSlider.value);
-        loadProjects();
-    });
+    yearSlider.addEventListener('input', loadProjects);
+    monthSlider.addEventListener('input', loadProjects);
 }
 
 // Кнопка паузы/старта
@@ -170,3 +161,13 @@ if (toggleButton) {
 }
 
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
+
+function switchPage() {
+    let selectedPage = document.getElementById("page-select").value;
+    window.location.href = selectedPage;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    let pageSelect = document.getElementById("page-select");
+    pageSelect.value = window.location.href.includes("page2.html") ? "page2.html" : "index.html";
+});
