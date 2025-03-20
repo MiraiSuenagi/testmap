@@ -15,26 +15,6 @@
             height: 100vh;
         }
 
-        /* Кнопка переключения страниц */
-        #switch-page-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
-            z-index: 1000;
-        }
-
-        #switch-page-btn:hover {
-            background: #0056b3;
-        }
-
         /* Левая панель */
         #sidebar {
             width: 300px;
@@ -49,6 +29,17 @@
         #sidebar h3 {
             margin: 0;
             font-size: 20px;
+        }
+
+        /* Стили для выпадающего списка страниц */
+        #page-select {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #fff;
+            cursor: pointer;
         }
 
         #region-select {
@@ -155,11 +146,19 @@
     </style>
 </head>
 <body>
-    <button id="switch-page-btn" onclick="switchPage()">Модернизация сельского здравоохранения</button>
 
     <!-- Левая панель -->
     <div id="sidebar">
         <h3>Фильтры</h3>
+
+        <!-- Выпадающий список для переключения страниц -->
+        <label for="page-select">Переключить страницу:</label>
+        <select id="page-select" onchange="switchPage()">
+            <option value="index.html">Комфортные школы</option>
+            <option value="page2.html">Модернизация здравоохранения</option>
+        </select>
+
+        <!-- Фильтр по регионам -->
         <label for="region-select">Выберите регион:</label>
         <select id="region-select">
             <option value="all">Все регионы</option>
@@ -168,29 +167,19 @@
             <option value="Актюбинская область">Актюбинская область</option>
             <option value="Алматинская область">Алматинская область</option>
             <option value="Атырауская область">Атырауская область</option>
-            <option value="Восточно-Казахстанская область">Восточно-Казахстанская область</option>
             <option value="Жамбылская область">Жамбылская область</option>
-            <option value="Жетысуская область">Жетысуская область</option>
-            <option value="Западно-Казахстанская область">Западно-Казахстанская область</option>
             <option value="Карагандинская область">Карагандинская область</option>
             <option value="Костанайская область">Костанайская область</option>
-            <option value="Кызылординская область">Кызылординская область</option>
-            <option value="Мангистауская область">Мангистауская область</option>
-            <option value="Павлодарская область">Павлодарская область</option>
-            <option value="Северо-Казахстанская область">Северо-Казахстанская область</option>
-            <option value="Туркестанская область">Туркестанская область</option>
-            <option value="Улытауская область">Улытауская область</option>
-            <option value="Астана">г. Астана</option>
-            <option value="Алматы">г. Алматы</option>
-            <option value="Шымкент">г. Шымкент</option>
         </select>
+
         <button class="filter-btn" onclick="applyRegionFilter()">Применить</button>
         <button class="filter-btn reset" onclick="resetFilters()">Сбросить</button>
-         <div id="school-info">
-    <h4>Общее количество школ: <span id="total-schools">0</span></h4>
-    <h4>Школ в регионе: <span id="filtered-schools">0</span></h4>
-    <div id="school-list"></div>
-</div>
+
+        <div id="school-info">
+            <h4>Общее количество школ: <span id="total-schools">0</span></h4>
+            <h4>Школ в регионе: <span id="filtered-schools">0</span></h4>
+            <div id="school-list"></div>
+        </div>
     </div>
 
     <!-- Основной контейнер -->
@@ -208,11 +197,6 @@
             <div class="slider-container">
                 <label for="month-slider">Выберите месяц:</label>
                 <input type="range" id="month-slider" min="1" max="12" step="1" value="1">
-                <div class="labels">
-                    <span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span>
-                    <span>Май</span><span>Июн</span><span>Июл</span><span>Авг</span>
-                    <span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
-                </div>
             </div>
             <button id="toggleAnimation">⏸ Пауза</button>
         </div>
@@ -221,10 +205,19 @@
     <script src="map.js" defer></script>
     <script>
         function switchPage() {
-            window.location.href = "page2.html";
+            let selectedPage = document.getElementById("page-select").value;
+            window.location.href = selectedPage;
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let pageSelect = document.getElementById("page-select");
+            if (window.location.href.includes("page2.html")) {
+                pageSelect.value = "page2.html";
+            } else {
+                pageSelect.value = "index.html";
+            }
+        });
     </script>
-   
 
 </body>
 </html>
