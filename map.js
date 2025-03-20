@@ -52,6 +52,9 @@ function updateSchoolInfo(filteredData) {
     let schoolList = document.getElementById("school-list");
     schoolList.innerHTML = "";
 
+    let completedSchoolList = document.getElementById("completed-school-list");
+    completedSchoolList.innerHTML = "";
+
     if (filteredData.length === 0) {
         schoolList.innerHTML = "<p>Нет школ в этом регионе.</p>";
     } else {
@@ -59,11 +62,20 @@ function updateSchoolInfo(filteredData) {
             let schoolItem = document.createElement("div");
             schoolItem.textContent = school.properties.name;
             schoolList.appendChild(schoolItem);
+
+            // Проверяем, завершено ли строительство школы
+            let currentDate = new Date(yearSlider.value, monthSlider.value - 1);
+            let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
+
+            if (completedDate <= currentDate) {
+                let completedSchoolItem = document.createElement("div");
+                completedSchoolItem.textContent = school.properties.name;
+                completedSchoolList.appendChild(completedSchoolItem);
+            }
         });
     }
 }
 
-// Функция загрузки и отображения школ
 // Функция загрузки и отображения школ
 function loadSchools() {
     if (!yearSlider || !monthSlider) return;
@@ -79,10 +91,10 @@ function loadSchools() {
     });
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
-    
+
     let greenSchoolsCount = 0; // Счетчик зеленых маркеров
     let schoolCounts = {};
-    
+
     filteredData.forEach(school => {
         let coords = school.geometry.coordinates.join(',');
         if (!schoolCounts[coords]) {
@@ -97,13 +109,13 @@ function loadSchools() {
         let schoolNames = schoolCounts[coords].map(s => s.properties.name).join("<br>");
 
         var currentDate = new Date(year, month - 1);
-        var completedDate = new Date(String(schoolCounts[coords][0].properties.completed).replace(".0", "-01-01")); 
+        var completedDate = new Date(String(schoolCounts[coords][0].properties.completed).replace(".0", "-01-01"));
 
         var markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый если завершено, иначе красный
 
         if (markerColor === "#28a745") {
-    greenSchoolsCount += count; // Учитываем все завершенные школы в маркере
-}
+            greenSchoolsCount += count; // Учитываем все завершенные школы в маркере
+        }
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
@@ -123,6 +135,8 @@ function loadSchools() {
     // Обновляем количество завершенных школ
     document.getElementById("filtered-schools").textContent = greenSchoolsCount;
 
+    // Обновляем список школ
+    updateSchoolInfo(filteredData);
 }
 
 // Фильтр по регионам
@@ -169,3 +183,17 @@ if (toggleButton) {
 }
 
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
+
+function switchPage() {
+    let selectedPage = document.getElementById("page-select").value;
+    window.location.href = selectedPage;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    let pageSelect = document.getElementById("page-select");
+    if (window.location.href.includes("page2.html")) {
+        pageSelect.value = "page2.html";
+    } else {
+        pageSelect.value = "index.html";
+    }
+});
