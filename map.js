@@ -105,8 +105,6 @@ function loadSchools() {
     greenSchoolsCount += count; // Учитываем все завершенные школы в маркере
 }
 
-        }
-
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
             fillColor: markerColor,
