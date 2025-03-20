@@ -18,14 +18,14 @@ let monthSlider = document.getElementById('month-slider');
 if (!yearSlider || !monthSlider) {
     console.error("Ошибка: Ползунки не найдены! Проверь ID элементов в HTML.");
 } else {
-    let currentYear = parseInt(yearSlider.value);
-    let maxYear = parseInt(yearSlider.max);
-    let currentMonth = parseInt(monthSlider.value);
-
     function autoPlaySlider() {
         let interval = setInterval(() => {
             if (!playing) return;
-
+            
+            let currentYear = parseInt(yearSlider.value);
+            let maxYear = parseInt(yearSlider.max);
+            let currentMonth = parseInt(monthSlider.value);
+            
             currentMonth++;
             if (currentMonth > 12) {
                 currentMonth = 1;
@@ -37,43 +37,10 @@ if (!yearSlider || !monthSlider) {
 
             monthSlider.value = currentMonth;
             yearSlider.value = currentYear;
-            loadSchools(); // Обновляем карту
+            loadSchools();
         }, 1000);
     }
-
     autoPlaySlider();
-}
-
-// Функция обновления информации в карточке
-function updateSchoolInfo(filteredData) {
-    document.getElementById("total-schools").textContent = schoolData.length;
-    document.getElementById("filtered-schools").textContent = filteredData.length;
-
-    let schoolList = document.getElementById("school-list");
-    schoolList.innerHTML = "";
-
-    let completedSchoolList = document.getElementById("completed-school-list");
-    completedSchoolList.innerHTML = "";
-
-    if (filteredData.length === 0) {
-        schoolList.innerHTML = "<p>Нет школ в этом регионе.</p>";
-    } else {
-        filteredData.forEach(school => {
-            let schoolItem = document.createElement("div");
-            schoolItem.textContent = school.properties.name;
-            schoolList.appendChild(schoolItem);
-
-            // Проверяем, завершено ли строительство школы
-            let currentDate = new Date(yearSlider.value, monthSlider.value - 1);
-            let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
-
-            if (completedDate <= currentDate) {
-                let completedSchoolItem = document.createElement("div");
-                completedSchoolItem.textContent = school.properties.name;
-                completedSchoolList.appendChild(completedSchoolItem);
-            }
-        });
-    }
 }
 
 // Функция загрузки и отображения школ
@@ -84,17 +51,20 @@ function loadSchools() {
     let month = parseInt(monthSlider.value);
     markers.clearLayers();
 
+    let currentDate = new Date(year, month - 1);
+    
     let filteredData = schoolData.filter(school => {
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
         if (selectedRegion !== "all" && school.properties.region !== selectedRegion) return false;
-        return true; // Показываем все объекты
+        return completedDate <= currentDate;
     });
-
+    
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
+    
+    document.getElementById("filtered-schools").textContent = filteredData.length;
+    document.getElementById("school-list").innerHTML = "";
 
-    let greenSchoolsCount = 0; // Счетчик зеленых маркеров
     let schoolCounts = {};
-
     filteredData.forEach(school => {
         let coords = school.geometry.coordinates.join(',');
         if (!schoolCounts[coords]) {
@@ -108,18 +78,9 @@ function loadSchools() {
         let count = schoolCounts[coords].length;
         let schoolNames = schoolCounts[coords].map(s => s.properties.name).join("<br>");
 
-        var currentDate = new Date(year, month - 1);
-        var completedDate = new Date(String(schoolCounts[coords][0].properties.completed).replace(".0", "-01-01"));
-
-        var markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый если завершено, иначе красный
-
-        if (markerColor === "#28a745") {
-            greenSchoolsCount += count; // Учитываем все завершенные школы в маркере
-        }
-
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
-            fillColor: markerColor,
+            fillColor: "#28a745",
             color: "#fff",
             weight: 1,
             opacity: 1,
@@ -131,12 +92,23 @@ function loadSchools() {
     });
 
     map.addLayer(markers);
+    updateSchoolList(filteredData);
+}
 
-    // Обновляем количество завершенных школ
-    document.getElementById("filtered-schools").textContent = greenSchoolsCount;
+// Функция обновления списка школ
+function updateSchoolList(schools) {
+    let schoolList = document.getElementById("school-list");
+    schoolList.innerHTML = "";
 
-    // Обновляем список школ
-    updateSchoolInfo(filteredData);
+    if (schools.length === 0) {
+        schoolList.innerHTML = "<p>Нет завершенных школ в этом регионе.</p>";
+    } else {
+        schools.forEach(school => {
+            let schoolItem = document.createElement("div");
+            schoolItem.textContent = school.properties.name;
+            schoolList.appendChild(schoolItem);
+        });
+    }
 }
 
 // Фильтр по регионам
@@ -162,15 +134,8 @@ fetch('schools.json')
     .catch(error => console.error('Ошибка загрузки данных:', error));
 
 if (yearSlider && monthSlider) {
-    yearSlider.addEventListener('input', () => {
-        currentYear = parseInt(yearSlider.value);
-        loadSchools();
-    });
-
-    monthSlider.addEventListener('input', () => {
-        currentMonth = parseInt(monthSlider.value);
-        loadSchools();
-    });
+    yearSlider.addEventListener('input', loadSchools);
+    monthSlider.addEventListener('input', loadSchools);
 }
 
 // Кнопка паузы/старта
@@ -191,9 +156,5 @@ function switchPage() {
 
 document.addEventListener("DOMContentLoaded", function () {
     let pageSelect = document.getElementById("page-select");
-    if (window.location.href.includes("page2.html")) {
-        pageSelect.value = "page2.html";
-    } else {
-        pageSelect.value = "index.html";
-    }
+    pageSelect.value = window.location.href.includes("page2.html") ? "page2.html" : "index.html";
 });
