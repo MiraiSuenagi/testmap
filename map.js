@@ -79,9 +79,10 @@ function loadSchools() {
     });
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
-    updateSchoolInfo(filteredData);
-
+    
+    let greenSchoolsCount = 0; // Счетчик зеленых маркеров
     let schoolCounts = {};
+    
     filteredData.forEach(school => {
         let coords = school.geometry.coordinates.join(',');
         if (!schoolCounts[coords]) {
@@ -95,10 +96,16 @@ function loadSchools() {
         let count = schoolCounts[coords].length;
         let schoolNames = schoolCounts[coords].map(s => s.properties.name).join("<br>");
 
-        var currentDate = new Date(year, month - 1); // Текущая дата на шкале
+        var currentDate = new Date(year, month - 1);
         var completedDate = new Date(String(schoolCounts[coords][0].properties.completed).replace(".0", "-01-01")); 
 
         var markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый если завершено, иначе красный
+
+        if (markerColor === "#28a745") {
+    greenSchoolsCount += count; // Учитываем все завершенные школы в маркере
+}
+
+        }
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
@@ -114,6 +121,10 @@ function loadSchools() {
     });
 
     map.addLayer(markers);
+
+    // Обновляем количество завершенных школ
+    document.getElementById("filtered-schools").textContent = greenSchoolsCount;
+
 }
 
 // Фильтр по регионам
