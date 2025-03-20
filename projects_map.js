@@ -1,4 +1,4 @@
-// Инициализация карты
+// Инициализация карты для page2.html
 var map = L.map('map').setView([48.0196, 66.9237], 5);
 
 // Добавление слоя карты (OpenStreetMap)
@@ -7,6 +7,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 var markers = L.layerGroup();
+map.addLayer(markers); // Добавляем слой маркеров на карту
+
 var projectData = [];
 var selectedRegion = "all"; // Выбранный регион
 
@@ -21,11 +23,11 @@ if (!yearSlider || !monthSlider) {
     function autoPlaySlider() {
         let interval = setInterval(() => {
             if (!playing) return;
-            
+
             let currentYear = parseInt(yearSlider.value);
             let maxYear = parseInt(yearSlider.max);
             let currentMonth = parseInt(monthSlider.value);
-            
+
             currentMonth++;
             if (currentMonth > 12) {
                 currentMonth = 1;
@@ -37,10 +39,30 @@ if (!yearSlider || !monthSlider) {
 
             monthSlider.value = currentMonth;
             yearSlider.value = currentYear;
-            loadProjects();
+            loadProjects(); // Обновляем карту
         }, 1000);
     }
+
     autoPlaySlider();
+}
+
+// Функция обновления информации в карточке
+function updateProjectInfo(filteredData) {
+    document.getElementById("total-projects").textContent = projectData.length;
+    document.getElementById("filtered-projects").textContent = filteredData.length;
+
+    let projectList = document.getElementById("project-list");
+    projectList.innerHTML = "";
+
+    if (filteredData.length === 0) {
+        projectList.innerHTML = "<p>Нет проектов в этом регионе.</p>";
+    } else {
+        filteredData.forEach(project => {
+            let projectItem = document.createElement("div");
+            projectItem.textContent = project.properties.name;
+            projectList.appendChild(projectItem);
+        });
+    }
 }
 
 // Функция загрузки и отображения проектов
@@ -49,32 +71,21 @@ function loadProjects() {
 
     let year = parseInt(yearSlider.value);
     let month = parseInt(monthSlider.value);
+    let currentDate = new Date(year, month - 1);
+
     markers.clearLayers();
 
-    let currentDate = new Date(year, month - 1);
-    
     let filteredData = projectData.filter(project => {
         let completedDate = new Date(String(project.properties.completed).replace(".0", "-01-01"));
-        
-        // Фильтр по региону
         if (selectedRegion !== "all" && project.properties.region !== selectedRegion) return false;
-        
         return true; // Показываем все объекты
     });
 
     console.log(`Проектов отфильтровано: ${filteredData.length} за ${year}-${month}`);
-    
-    // Фильтрация завершенных проектов
-    let completedProjects = filteredData.filter(project => {
-        let completedDate = new Date(String(project.properties.completed).replace(".0", "-01-01"));
-        return completedDate <= currentDate;
-    });
 
-    document.getElementById("filtered-projects").textContent = completedProjects.length; // Только завершенные проекты
-
-    document.getElementById("project-list").innerHTML = "";
-
+    let greenProjectsCount = 0; // Счетчик зеленых маркеров
     let projectCounts = {};
+
     filteredData.forEach(project => {
         let coords = project.geometry.coordinates.join(',');
         if (!projectCounts[coords]) {
@@ -89,7 +100,11 @@ function loadProjects() {
         let projectNames = projectCounts[coords].map(p => p.properties.name).join("<br>");
 
         let completedDate = new Date(String(projectCounts[coords][0].properties.completed).replace(".0", "-01-01"));
-        let markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый - завершенные, красный - незавершенные
+        let markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Красный если не завершен, зеленый если завершен
+
+        if (markerColor === "#28a745") {
+            greenProjectsCount += count; // Учитываем все завершенные проекты
+        }
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
@@ -105,23 +120,12 @@ function loadProjects() {
     });
 
     map.addLayer(markers);
-    updateProjectList(completedProjects);
-}
 
-// Функция обновления списка проектов
-function updateProjectList(projects) {
-    let projectList = document.getElementById("project-list");
-    projectList.innerHTML = "";
+    // Обновляем количество завершенных проектов
+    document.getElementById("filtered-projects").textContent = greenProjectsCount;
 
-    if (projects.length === 0) {
-        projectList.innerHTML = "<p>Нет завершенных проектов в этом регионе.</p>";
-    } else {
-        projects.forEach(project => {
-            let projectItem = document.createElement("div");
-            projectItem.textContent = project.properties.name;
-            projectList.appendChild(projectItem);
-        });
-    }
+    // Обновляем список проектов
+    updateProjectInfo(filteredData);
 }
 
 // Фильтр по регионам
@@ -139,7 +143,7 @@ function resetFilters() {
 fetch('projects.json')
     .then(response => response.json())
     .then(data => {
-        projectData = data.features; // Берем массив проектов из JSON
+        projectData = data.features;
         console.log("Данные проектов загружены:", projectData);
         document.getElementById("total-projects").textContent = projectData.length;
         loadProjects();
@@ -161,13 +165,3 @@ if (toggleButton) {
 }
 
 document.getElementById("region-select").addEventListener("change", applyRegionFilter);
-
-function switchPage() {
-    let selectedPage = document.getElementById("page-select").value;
-    window.location.href = selectedPage;
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    let pageSelect = document.getElementById("page-select");
-    pageSelect.value = window.location.href.includes("page2.html") ? "page2.html" : "index.html";
-});
