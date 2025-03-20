@@ -64,6 +64,7 @@ function updateSchoolInfo(filteredData) {
 }
 
 // Функция загрузки и отображения школ
+// Функция загрузки и отображения школ
 function loadSchools() {
     if (!yearSlider || !monthSlider) return;
 
@@ -72,13 +73,9 @@ function loadSchools() {
     markers.clearLayers();
 
     let filteredData = schoolData.filter(school => {
-        if (!school.properties.completed) return false;
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
-        let isCompleted = completedDate.getFullYear() < year || 
-            (completedDate.getFullYear() === year && completedDate.getMonth() + 1 <= month);
-        if (!isCompleted) return false;
         if (selectedRegion !== "all" && school.properties.region !== selectedRegion) return false;
-        return true;
+        return true; // Показываем все объекты
     });
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
@@ -90,34 +87,35 @@ function loadSchools() {
         if (!schoolCounts[coords]) {
             schoolCounts[coords] = [];
         }
-        schoolCounts[coords].push(school.properties.name);
+        schoolCounts[coords].push(school);
     });
 
     Object.keys(schoolCounts).forEach(coords => {
         let [lng, lat] = coords.split(',').map(Number);
         let count = schoolCounts[coords].length;
-        let schoolNames = schoolCounts[coords].join("<br>");
+        let schoolNames = schoolCounts[coords].map(s => s.properties.name).join("<br>");
 
-      var currentDate = new Date(year, month - 1); // Текущая дата на шкале
-var completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01")); 
+        var currentDate = new Date(year, month - 1); // Текущая дата на шкале
+        var completedDate = new Date(String(schoolCounts[coords][0].properties.completed).replace(".0", "-01-01")); 
 
-var markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый если завершено, иначе красный
+        var markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый если завершено, иначе красный
 
-var circle = L.circleMarker([lat, lng], {
-    radius: 8 + count * 2,
-    fillColor: markerColor,
-    color: "#fff",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8,
-    interactive: true
-}).bindPopup(`<b>Школы:</b><br>${schoolNames}`);
-
+        var circle = L.circleMarker([lat, lng], {
+            radius: 8 + count * 2,
+            fillColor: markerColor,
+            color: "#fff",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8,
+            interactive: true
+        }).bindPopup(`<b>Школы:</b><br>${schoolNames}`);
 
         markers.addLayer(circle);
     });
 
     map.addLayer(markers);
+
+
 }
 
 // Фильтр по регионам
