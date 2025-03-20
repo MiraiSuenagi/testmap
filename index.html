@@ -89,6 +89,24 @@
             font-size: 14px;
         }
 
+        /* Стили для завершенных школ */
+        #completed-schools {
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+
+        #completed-school-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 5px;
+            font-size: 14px;
+        }
+
         /* Контейнер для карты */
         #main-container {
             flex-grow: 1;
@@ -161,29 +179,29 @@
 
         <!-- Фильтр по регионам -->
         <label for="region-select">Выберите регион:</label>
-<select id="region-select">
-    <option value="all">Все регионы</option>
-    <option value="Абайская область">Абайская область</option>
-    <option value="Акмолинская область">Акмолинская область</option>
-    <option value="Актюбинская область">Актюбинская область</option>
-    <option value="Алматинская область">Алматинская область</option>
-    <option value="Атырауская область">Атырауская область</option>
-    <option value="Восточно-Казахстанская область">Восточно-Казахстанская область</option>
-    <option value="Жамбылская область">Жамбылская область</option>
-    <option value="Жетысуская область">Жетысуская область</option>
-    <option value="Западно-Казахстанская область">Западно-Казахстанская область</option>
-    <option value="Карагандинская область">Карагандинская область</option>
-    <option value="Костанайская область">Костанайская область</option>
-    <option value="Кызылординская область">Кызылординская область</option>
-    <option value="Мангистауская область">Мангистауская область</option>
-    <option value="Павлодарская область">Павлодарская область</option>
-    <option value="Северо-Казахстанская область">Северо-Казахстанская область</option>
-    <option value="Туркестанская область">Туркестанская область</option>
-    <option value="Улытауская область">Улытауская область</option>
-    <option value="Астана">г. Астана</option>
-    <option value="Алматы">г. Алматы</option>
-    <option value="Шымкент">г. Шымкент</option>
-</select>
+        <select id="region-select">
+            <option value="all">Все регионы</option>
+            <option value="Абайская область">Абайская область</option>
+            <option value="Акмолинская область">Акмолинская область</option>
+            <option value="Актюбинская область">Актюбинская область</option>
+            <option value="Алматинская область">Алматинская область</option>
+            <option value="Атырауская область">Атырауская область</option>
+            <option value="Восточно-Казахстанская область">Восточно-Казахстанская область</option>
+            <option value="Жамбылская область">Жамбылская область</option>
+            <option value="Жетысуская область">Жетысуская область</option>
+            <option value="Западно-Казахстанская область">Западно-Казахстанская область</option>
+            <option value="Карагандинская область">Карагандинская область</option>
+            <option value="Костанайская область">Костанайская область</option>
+            <option value="Кызылординская область">Кызылординская область</option>
+            <option value="Мангистауская область">Мангистауская область</option>
+            <option value="Павлодарская область">Павлодарская область</option>
+            <option value="Северо-Казахстанская область">Северо-Казахстанская область</option>
+            <option value="Туркестанская область">Туркестанская область</option>
+            <option value="Улытауская область">Улытауская область</option>
+            <option value="Астана">г. Астана</option>
+            <option value="Алматы">г. Алматы</option>
+            <option value="Шымкент">г. Шымкент</option>
+        </select>
 
         <button class="filter-btn" onclick="applyRegionFilter()">Применить</button>
         <button class="filter-btn reset" onclick="resetFilters()">Сбросить</button>
@@ -192,6 +210,12 @@
             <h4>Общее количество школ: <span id="total-schools">0</span></h4>
             <h4>Школ в регионе: <span id="filtered-schools">0</span></h4>
             <div id="school-list"></div>
+        </div>
+
+        <!-- Список завершенных школ -->
+        <div id="completed-schools">
+            <h4>Завершенные школы:</h4>
+            <div id="completed-school-list"></div>
         </div>
     </div>
 
@@ -220,22 +244,6 @@
         </div>
     </div>
 
-    <script src="map.js" defer></script>
-    <script>
-        function switchPage() {
-            let selectedPage = document.getElementById("page-select").value;
-            window.location.href = selectedPage;
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            let pageSelect = document.getElementById("page-select");
-            if (window.location.href.includes("page2.html")) {
-                pageSelect.value = "page2.html";
-            } else {
-                pageSelect.value = "index.html";
-            }
-        });
-    </script>
-
+    <script src="map.js"></script>
 </body>
 </html>
