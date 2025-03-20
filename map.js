@@ -56,9 +56,9 @@ function loadSchools() {
     let filteredData = schoolData.filter(school => {
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
         if (selectedRegion !== "all" && school.properties.region !== selectedRegion) return false;
-        return completedDate <= currentDate;
+        return true; // Показываем все объекты
     });
-    
+
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
     
     document.getElementById("filtered-schools").textContent = filteredData.length;
@@ -78,9 +78,12 @@ function loadSchools() {
         let count = schoolCounts[coords].length;
         let schoolNames = schoolCounts[coords].map(s => s.properties.name).join("<br>");
 
+        let completedDate = new Date(String(schoolCounts[coords][0].properties.completed).replace(".0", "-01-01"));
+        let markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый - завершенные, красный - еще не построенные
+
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
-            fillColor: "#28a745",
+            fillColor: markerColor,
             color: "#fff",
             weight: 1,
             opacity: 1,
@@ -101,7 +104,7 @@ function updateSchoolList(schools) {
     schoolList.innerHTML = "";
 
     if (schools.length === 0) {
-        schoolList.innerHTML = "<p>Нет завершенных школ в этом регионе.</p>";
+        schoolList.innerHTML = "<p>Нет школ в этом регионе.</p>";
     } else {
         schools.forEach(school => {
             let schoolItem = document.createElement("div");
