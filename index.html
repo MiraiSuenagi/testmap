@@ -136,11 +136,12 @@
             cursor: pointer;
         }
 
+        /* Стили для подписей месяцев */
         .labels {
             display: flex;
             justify-content: space-between;
             margin-top: 5px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
         }
     </style>
@@ -197,6 +198,11 @@
             <div class="slider-container">
                 <label for="month-slider">Выберите месяц:</label>
                 <input type="range" id="month-slider" min="1" max="12" step="1" value="1">
+                <div class="labels">
+                    <span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span>
+                    <span>Май</span><span>Июн</span><span>Июл</span><span>Авг</span>
+                    <span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span>
+                </div>
             </div>
             <button id="toggleAnimation">⏸ Пауза</button>
         </div>
