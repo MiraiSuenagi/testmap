@@ -114,8 +114,6 @@ function loadSchools() {
     });
 
     map.addLayer(markers);
-
-
 }
 
 // Фильтр по регионам
