@@ -139,7 +139,7 @@ function resetFilters() {
 fetch('projects.json')
     .then(response => response.json())
     .then(data => {
-        projectData = data;
+        projectData = data.features; // Берем массив проектов из JSON
         console.log("Данные проектов загружены:", projectData);
         document.getElementById("total-projects").textContent = projectData.length;
         loadProjects();
