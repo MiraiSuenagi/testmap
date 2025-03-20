@@ -55,13 +55,23 @@ function loadSchools() {
     
     let filteredData = schoolData.filter(school => {
         let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
+        
+        // Фильтр по региону
         if (selectedRegion !== "all" && school.properties.region !== selectedRegion) return false;
-        return true; // Показываем все объекты
+        
+        return true; // Показываем все школы
     });
 
     console.log(`Школ отфильтровано: ${filteredData.length} за ${year}-${month}`);
     
-    document.getElementById("filtered-schools").textContent = filteredData.length;
+    // Фильтрация завершенных школ
+    let completedSchools = filteredData.filter(school => {
+        let completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01"));
+        return completedDate <= currentDate;
+    });
+
+    document.getElementById("filtered-schools").textContent = completedSchools.length; // Только завершенные школы
+
     document.getElementById("school-list").innerHTML = "";
 
     let schoolCounts = {};
@@ -79,7 +89,7 @@ function loadSchools() {
         let schoolNames = schoolCounts[coords].map(s => s.properties.name).join("<br>");
 
         let completedDate = new Date(String(schoolCounts[coords][0].properties.completed).replace(".0", "-01-01"));
-        let markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый - завершенные, красный - еще не построенные
+        let markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый - завершенные, красный - не завершенные
 
         var circle = L.circleMarker([lat, lng], {
             radius: 8 + count * 2,
@@ -95,7 +105,7 @@ function loadSchools() {
     });
 
     map.addLayer(markers);
-    updateSchoolList(filteredData);
+    updateSchoolList(completedSchools);
 }
 
 // Функция обновления списка школ
@@ -104,7 +114,7 @@ function updateSchoolList(schools) {
     schoolList.innerHTML = "";
 
     if (schools.length === 0) {
-        schoolList.innerHTML = "<p>Нет школ в этом регионе.</p>";
+        schoolList.innerHTML = "<p>Нет завершенных школ в этом регионе.</p>";
     } else {
         schools.forEach(school => {
             let schoolItem = document.createElement("div");
