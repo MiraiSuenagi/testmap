@@ -98,15 +98,21 @@ function loadSchools() {
         let count = schoolCounts[coords].length;
         let schoolNames = schoolCounts[coords].join("<br>");
 
-        var circle = L.circleMarker([lat, lng], {
-            radius: 8 + count * 2,
-            fillColor: "#28a745",
-            color: "#fff",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8,
-            interactive: true
-        }).bindPopup(`<b>Школы:</b><br>${schoolNames}`);
+      var currentDate = new Date(year, month - 1); // Текущая дата на шкале
+var completedDate = new Date(String(school.properties.completed).replace(".0", "-01-01")); 
+
+var markerColor = completedDate <= currentDate ? "#28a745" : "#dc3545"; // Зеленый если завершено, иначе красный
+
+var circle = L.circleMarker([lat, lng], {
+    radius: 8 + count * 2,
+    fillColor: markerColor,
+    color: "#fff",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8,
+    interactive: true
+}).bindPopup(`<b>Школы:</b><br>${schoolNames}`);
+
 
         markers.addLayer(circle);
     });
